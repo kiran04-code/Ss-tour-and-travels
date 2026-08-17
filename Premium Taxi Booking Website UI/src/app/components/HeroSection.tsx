@@ -21,7 +21,7 @@ export function HeroSection() {
           src={heroSceneBg}
           alt=""
           aria-hidden="true"
-          className="h-full w-full pl-10 object-cover "
+          className="h-full w-full  object-cover "
         />
       </div>
 
