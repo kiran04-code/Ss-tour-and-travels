@@ -212,8 +212,176 @@ export default function App() {
   </div>
 </section>
         </main>
-        <footer id="contact" className="bg-[#051533] px-5 py-10 text-white"><div className="mx-auto grid max-w-[1320px] gap-8 sm:grid-cols-2 lg:grid-cols-4"><div><Logo /><p className="mt-4 max-w-xs text-sm leading-relaxed text-white/55">Reliable local and outstation rides from Solapur, whenever you need to travel.</p></div><div><p className="text-xs font-bold tracking-[.16em] text-[#F9B900]">SERVICES</p><div className="mt-3 grid gap-2 text-sm text-white/60"><span>Local travel</span><span>Outstation trips</span><span>Airport transfers</span><span>Temple tours</span></div></div><div><p className="text-xs font-bold tracking-[.16em] text-[#F9B900]">CONTACT</p><a className="mt-3 block text-lg font-extrabold text-white" href={"tel:" + PHONE}>+91 98765 43210</a><a className="mt-2 inline-block text-sm text-white/60 hover:text-[#F9B900]" href={"https://wa.me/" + PHONE.slice(1)}>Chat on WhatsApp</a></div><div><p className="text-xs font-bold tracking-[.16em] text-[#F9B900]">AVAILABLE</p><p className="mt-3 text-sm leading-relaxed text-white/60">24/7 booking support<br />Solapur, Maharashtra</p><a href="#book" className="mt-4 inline-block border border-white/30 px-4 py-2 text-xs font-bold hover:border-[#F9B900] hover:text-[#F9B900]">Request a quote</a></div></div><div className="mx-auto mt-8 max-w-[1320px] border-t border-white/10 pt-4 text-xs text-white/40">ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© 2026 SS Tours &amp; Travels. All rights reserved.</div></footer>
-        {car && <div className="fixed inset-0 z-[60] grid place-items-center bg-[#071D49]/75 p-4"><div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto bg-white shadow-2xl"><button onClick={() => setCar(null)} className="float-right p-4"><X /></button><div className="grid md:grid-cols-2"><img src={car.img} alt={car.name} className="h-72 w-full object-cover md:h-full" /><div className="p-7"><p className="text-xs font-bold tracking-[.16em] text-[#9a7100]">{car.tag} ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· {car.type}</p><h2 className="mt-2 text-3xl font-extrabold">{car.name}</h2><div className="mt-3"><Stars /> <b className="ml-2">4.9 rating</b></div><p className="mt-4 text-2xl font-extrabold text-[#071D49]">{car.rate}</p><div className="mt-5 grid grid-cols-2 gap-3 text-sm text-[#64748B]">{[car.seats, "Air Conditioned", "2 large bags", "Music system", "Verified driver", "Safety checked"].map(x => <span key={x} className="border-l-2 border-[#F9B900] pl-2">{x}</span>)}</div><p className="mt-5 text-sm leading-relaxed text-[#64748B]">Comfortable seating, responsible driving and a local professional who knows the route.</p><div className="mt-6 flex flex-wrap gap-2"><a href="#book" onClick={() => setCar(null)} className="bg-[#F9B900] px-4 py-3 text-sm font-bold">Book This Car</a><a href={"tel:" + PHONE} className="bg-[#071D49] px-4 py-3 text-sm font-bold text-white">Call Now</a><a href={"https://wa.me/" + PHONE.slice(1)} className="border border-[#071D49] px-4 py-3 text-sm font-bold">WhatsApp</a></div><p className="mt-6 border-t pt-4 text-xs text-[#64748B]">Vehicle-specific guest feedback: <b>ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œSmooth, comfortable and on time.ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â</b></p></div></div></div></div>}
+<footer id="contact" className="bg-[#051533] px-5 py-10 text-white">
+  <div className="mx-auto grid max-w-[1320px] gap-8 sm:grid-cols-2 lg:grid-cols-4">
+
+    <div>
+      <Logo />
+      <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/55">
+        Comfortable, reliable and affordable rides for local and outstation
+        travel across Maharashtra.
+      </p>
+    </div>
+
+    <div>
+      <p className="text-xs font-bold tracking-[.16em] text-[#F9B900]">
+        OUR SERVICES
+      </p>
+      <div className="mt-3 grid gap-2 text-sm text-white/60">
+        <span>City Rides</span>
+        <span>Outstation Rides</span>
+        <span>Airport Pickup & Drop</span>
+        <span>Tour &amp; Travel</span>
+      </div>
+    </div>
+
+    <div>
+      <p className="text-xs font-bold tracking-[.16em] text-[#F9B900]">
+        GET IN TOUCH
+      </p>
+
+      <a
+        className="mt-3 block text-lg font-extrabold text-white"
+        href={"tel:" + PHONE}
+      >
+        +91 98765 43210
+      </a>
+
+      <a
+        className="mt-2 inline-block text-sm text-white/60 hover:text-[#F9B900]"
+        href={"https://wa.me/" + PHONE.slice(1)}
+      >
+        WhatsApp us
+      </a>
+    </div>
+
+    <div>
+      <p className="text-xs font-bold tracking-[.16em] text-[#F9B900]">
+        TRAVEL WITH US
+      </p>
+
+      <p className="mt-3 text-sm leading-relaxed text-white/60">
+        Available 24/7 for your travel needs.
+        <br />
+        Solapur, Maharashtra
+      </p>
+
+      <a
+        href="#book"
+        className="mt-4 inline-block border border-white/30 px-4 py-2 text-xs font-bold transition hover:border-[#F9B900] hover:text-[#F9B900]"
+      >
+        Book Your Ride
+      </a>
+    </div>
+
+  </div>
+
+  <div className="mx-auto mt-8 max-w-[1320px] border-t border-white/10 pt-4 text-xs text-white/40">
+    © 2026 SS Tours &amp; Travels. All rights reserved.
+  </div>
+</footer>    
+{car && (
+  <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#071D49]/75 p-3 sm:p-6">
+    <div className="relative max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-xl bg-white shadow-2xl sm:rounded-2xl">
+
+      <button
+        onClick={() => setCar(null)}
+        className="absolute right-2 top-2 z-10 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-[#071D49] shadow sm:right-4 sm:top-4"
+      >
+        <X size={18} />
+      </button>
+
+      <div className="grid md:grid-cols-2">
+
+        {/* Image */}
+        <img
+          src={car.img}
+          alt={car.name}
+          className="h-40 w-full object-cover sm:h-56 md:h-full md:min-h-[500px]"
+        />
+
+        {/* Content */}
+        <div className="p-4 sm:p-7">
+
+          <p className="text-[9px] font-bold uppercase tracking-[.16em] text-[#9a7100] sm:text-xs">
+            {car.tag} · {car.type}
+          </p>
+
+          <h2 className="mt-1 text-2xl font-extrabold text-[#071D49] sm:mt-2 sm:text-3xl">
+            {car.name}
+          </h2>
+
+          <div className="mt-2 flex items-center text-sm">
+            <Stars />
+            <b className="ml-2">4.9</b>
+            <span className="ml-1 text-[#64748B]">rating</span>
+          </div>
+
+          <p className="mt-2 text-xl font-extrabold text-[#071D49] sm:mt-3 sm:text-2xl">
+            {car.rate}
+          </p>
+
+          {/* Features */}
+          <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-[#64748B] sm:mt-5 sm:gap-3 sm:text-sm">
+            {[
+              car.seats,
+              "Air Conditioned",
+              "2 large bags",
+              "Music system",
+              "Verified driver",
+              "Safety checked",
+            ].map(x => (
+              <span
+                key={x}
+                className="rounded-md bg-[#F8FAFC] px-2 py-2 sm:border-l-2 sm:border-[#F9B900] sm:bg-transparent sm:pl-2"
+              >
+                {x}
+              </span>
+            ))}
+          </div>
+
+          <p className="mt-4 text-xs leading-relaxed text-[#64748B] sm:mt-5 sm:text-sm">
+            Comfortable seating, responsible driving and a local professional
+            who knows the route.
+          </p>
+
+          {/* Buttons */}
+          <div className="mt-5 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+            <a
+              href="#book"
+              onClick={() => setCar(null)}
+              className="rounded-lg bg-[#F9B900] px-3 py-2.5 text-center text-xs font-bold text-[#071D49] sm:px-4 sm:py-3 sm:text-sm"
+            >
+              Book This Car
+            </a>
+
+            <a
+              href={"tel:" + PHONE}
+              className="rounded-lg bg-[#071D49] px-3 py-2.5 text-center text-xs font-bold text-white sm:px-4 sm:py-3 sm:text-sm"
+            >
+              Call Now
+            </a>
+
+            <a
+              href={"https://wa.me/" + PHONE.slice(1)}
+              className="col-span-2 rounded-lg border border-[#071D49] px-3 py-2.5 text-center text-xs font-bold text-[#071D49] sm:w-auto sm:text-sm"
+            >
+              WhatsApp
+            </a>
+          </div>
+
+          <p className="mt-4 border-t pt-3 text-[10px] leading-relaxed text-[#64748B] sm:mt-6 sm:pt-4 sm:text-xs">
+            Vehicle feedback:{" "}
+            <b>
+              “Smooth, comfortable and on time.”
+            </b>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+)}    
         {review && <div className="fixed inset-0 z-[70] grid place-items-center bg-[#071D49]/75 p-4"><div className="w-full max-w-md bg-white p-7 shadow-2xl"><button onClick={() => setReview(false)} className="float-right"><X /></button>{sent ? <div className="py-10 text-center"><span className="inline-grid h-14 w-14 place-items-center rounded-full bg-[#F9B900]"><Check /></span><h2 className="mt-5 text-2xl font-extrabold">Thank you for sharing.</h2><p className="mt-2 text-sm text-[#64748B]">Your review has been received.</p><button onClick={() => setReview(false)} className="mt-6 bg-[#071D49] px-5 py-3 text-sm font-bold text-white">Close</button></div> : <form onSubmit={e => { e.preventDefault(); setSent(true) }}><p className="text-xs font-bold tracking-[.18em] text-[#9a7100]">YOUR EXPERIENCE</p><h2 className="mt-2 text-2xl font-extrabold">Write a Review</h2><label className="mt-5 block text-xs font-bold">Name<input required className="mt-2 w-full border-b p-3 outline-none focus:border-[#F9B900]" /></label><div className="mt-5"><p className="text-xs font-bold">Star Rating</p><div className="mt-2"><Stars /></div></div><label className="mt-5 block text-xs font-bold">Your Experience<textarea required className="mt-2 h-24 w-full border p-3 text-sm outline-none focus:border-[#F9B900]" /></label><button className="mt-5 w-full bg-[#071D49] py-3 text-sm font-bold text-white">Submit Review</button></form>}</div></div>}
         <div className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-2 lg:hidden"><a href={"tel:" + PHONE} className="bg-[#F9B900] py-3 text-center text-xs font-extrabold">Call Now</a><a href="#book" className="bg-[#071D49] py-3 text-center text-xs font-extrabold text-white">Book a Ride</a></div></div>
 }
