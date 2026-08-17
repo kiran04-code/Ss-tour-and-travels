@@ -13,84 +13,21 @@ header {
   border-bottom-color: transparent !important;
 }
 
-/* Full vehicle showcase layer — separate from the hero background to avoid cropping. */
-#home::after {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  right: -1%;
-  bottom: 1%;
-  width: 56%;
-  height: 72%;
-  pointer-events: none;
-  background: url("https://media.cars24.com/hello-ar/dev/transformed/uploads/no_bg/07e5f1b6-397a-11f1-bd53-02ede2007fbe/7e07f57b-a815-4bf6-a28c-16127a69dd98/669915e4-0f4a-496a-b700-9671903bcdbe/f11f4320-a906-4936-a73f-e91f4ac41819/slot/1.png?format=auto&pad=80%2C0%2C60&quality=75&trim-color=auto&width=3840") right bottom / contain no-repeat;
-  filter: drop-shadow(0 24px 20px rgba(0, 0, 0, .35));
+/* Give the main menu the confident, readable scale of a travel brand. */
+@media (min-width: 1280px) {
+  header nav a {
+    font-size: 14px !important;
+  }
 }
 
-#home > div:nth-child(4),
-#home > div:last-child {
-  z-index: 2;
-}
-
-/* Bring the vehicle into view earlier without leaving empty space above the copy. */
-#home > div:nth-child(4) {
-  min-height: 570px !important;
-}
-
-/* A single background vehicle reads more cleanly than overlapping car layers. */
-#home::after {
-  display: none;
-}
-
+/* Mobile service benefits grid inside the home section. */
 @media (max-width: 639px) {
-  #home > div:first-child {
-    background-position: 67% 70% !important;
-    background-size: cover !important;
-  }
-
-  #home::after {
-    right: -10%;
-    bottom: 0;
-    width: 120%;
-    height: 42%;
-    background-position: center bottom;
-  }
-
-  #home > div:nth-child(4) {
-    min-height: 560px !important;
-    padding-bottom: 112px !important;
-  }
-
-  /* Keep the vehicle visible beneath the mobile hero copy. */
-  #home > div:nth-child(3) {
-    background-image: linear-gradient(to top, rgba(2, 5, 11, .22), transparent) !important;
-  }
-
-  /* A compact, balanced mobile arrangement for the service benefits. */
   #home > div:last-child {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
   #home > div:last-child > div:last-child {
     grid-column: span 2 / span 2;
-  }
-}
-
-/* Hero composition is intentionally contained: the MPV must remain fully visible. */
-#home > div:first-child {
-  background-image: radial-gradient(ellipse at 86% 27%, #4b86b3 0%, #245276 27%, #0a294b 56%, #020914 100%) !important;
-  background-position: center !important;
-  background-size: auto !important;
-}
-
-#home > div:nth-child(2) {
-  background-image: linear-gradient(165deg, transparent 0%, rgba(23, 73, 49, .72) 42%, #061c28 100%) !important;
-}
-
-/* Give the main menu the confident, readable scale of a travel brand. */
-@media (min-width: 1280px) {
-  header nav a {
-    font-size: 14px !important;
   }
 }
 

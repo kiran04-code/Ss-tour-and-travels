@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd \"Premium Taxi Booking Website UI\" && npm install && npm run build",
+  "outputDirectory": "Premium Taxi Booking Website UI/dist",
+  "installCommand": "cd \"Premium Taxi Booking Website UI\" && npm install",
+  "framework": "vite"
+}
