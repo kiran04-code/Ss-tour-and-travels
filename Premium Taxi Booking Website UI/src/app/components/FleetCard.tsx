@@ -30,10 +30,10 @@ type FleetCardProps = {
 
 export function FleetCard({ car, onViewDetails, onBook }: FleetCardProps) {
   return (
-    <article className="group overflow-hidden border border-[#DDE4EF] bg-white shadow-[0_10px_28px_rgba(7,29,73,.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#c5d0e0] hover:shadow-[0_18px_38px_rgba(7,29,73,.12)]">
+    <article className="group overflow-hidden rounded-xl border border-[#E5E5E5] bg-white shadow-[0_5px_18px_rgba(0,0,0,.06)] transition-all duration-300 hover:-translate-y-1 hover:border-[#FFC928] hover:shadow-[0_14px_30px_rgba(0,0,0,.1)]">
       {/* Image canvas */}
-      <div className="relative flex aspect-[16/10] items-center justify-center bg-gradient-to-br from-[#eef3f9] to-[#dce7f3] p-4 sm:p-5">
-        <span className="absolute left-3 top-3 z-10 bg-[#F9B900] px-3 py-1 text-[10px] font-extrabold tracking-[.14em] text-[#071D49] shadow-[3px_3px_0_rgba(7,29,73,.14)]">
+      <div className="relative flex aspect-[16/10] items-center justify-center bg-[#F7F7F7] p-4 sm:p-5">
+        <span className="absolute left-3 top-3 z-10 rounded bg-[#FFC928] px-3 py-1 text-[10px] font-extrabold tracking-[.14em] text-[#171717]">
           {car.tag}
         </span>
         <img
@@ -52,7 +52,7 @@ export function FleetCard({ car, onViewDetails, onBook }: FleetCardProps) {
           <Stars />
         </div>
 
-        <h3 className="mt-2 text-2xl font-extrabold tracking-tight text-[#071D49]">
+        <h3 className="mt-2 text-xl font-extrabold tracking-tight text-[#171717]">
           {car.name}
         </h3>
 
@@ -68,14 +68,14 @@ export function FleetCard({ car, onViewDetails, onBook }: FleetCardProps) {
           <button
             type="button"
             onClick={() => onViewDetails(car)}
-            className="border border-[#071D49] py-2.5 text-xs font-bold text-[#071D49] transition-colors duration-200 hover:bg-[#071D49] hover:text-white"
+            className="rounded-lg border border-[#171717] py-2.5 text-xs font-bold text-[#171717] transition-colors duration-200 hover:bg-[#171717] hover:text-white"
           >
             View Details
           </button>
           <button
             type="button"
             onClick={() => onBook(car)}
-            className="bg-[#071D49] py-2.5 text-xs font-bold text-white transition-colors duration-200 hover:bg-[#F9B900] hover:text-[#071D49]"
+            className="rounded-lg bg-[#FFC928] py-2.5 text-xs font-bold text-[#171717] transition-colors duration-200 hover:bg-[#e6ad00]"
           >
             Book Now
           </button>

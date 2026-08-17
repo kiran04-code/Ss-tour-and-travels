@@ -8,9 +8,56 @@ body {
   font-style: normal;
 }
 
-/* Keep the glass navbar visually joined to the hero image. */
+header { border-bottom-color: #e5e5e5 !important; }
+
+/* Shared taxi-template treatment for the existing page components. */
 header {
-  border-bottom-color: transparent !important;
+  background: #171717 !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, .18);
+}
+header nav a, header .text-white\/80, header .text-white { color: #fff !important; }
+header .border-white\/20, header .border-white\/30 { border-color: rgba(255,255,255,.25) !important; }
+header .text-\[\#F9B900\] { color: #FFC928 !important; }
+header > nav { background: #171717 !important; border-top-color: rgba(255,255,255,.14) !important; }
+header > nav a { border-bottom-color: rgba(255,255,255,.14) !important; }
+header > nav a:last-child { background: #FFC928 !important; color: #171717 !important; }
+
+#home { background: #f7f7f7 !important; color: #171717 !important; }
+#book > div { border-radius: 12px; background: #222 !important; padding: 22px !important; }
+#book form > div:first-child p:first-child, #book form > div:first-child p:nth-child(2) { color: #fff !important; }
+#book label span { color: #f0f0f0 !important; }
+#book input, #book select { border: 1px solid #e5e5e5 !important; border-radius: 8px; background: #fff !important; color: #171717; }
+#book form button { border-radius: 8px; background: #FFC928 !important; color: #171717 !important; }
+#home > div:last-child { background: #171717 !important; }
+
+#experience, #destinations { background: #f7f7f7 !important; }
+#cars { padding-top: 84px; padding-bottom: 84px; }
+#cars h2, #experience h2, #destinations h2, #reviews h2 { color: #171717 !important; }
+#cars > div > div:first-child p, #experience > div > div:first-child p:first-child, #destinations > div > div:first-child p:first-child, #reviews .tracking-\[0\.22em\] { color: #a87900 !important; }
+#reviews { max-width: none !important; background: #f7f7f7; padding-top: 64px !important; padding-bottom: 64px !important; }
+#reviews > div { max-width: 1240px; margin-inline: auto; }
+#reviews h2, #reviews .text-\[\#071D49\], #reviews b { color: #171717 !important; }
+#reviews .text-\[\#9a7100\] { color: #9a7100 !important; }
+#reviews .bg-\[\#071D49\] { background-color: #171717 !important; }
+#reviews .hover\:bg-\[\#F9B900\]:hover { background-color: #FFC928 !important; color: #171717 !important; }
+#reviews .text-\[\#F9B900\] { color: #e6ad00 !important; }
+#reviews article { border-radius: 10px; border-color: #e5e5e5 !important; box-shadow: 0 4px 16px rgba(0,0,0,.05); }
+#reviews article:hover { border-color: #FFC928 !important; box-shadow: 0 12px 26px rgba(0,0,0,.09) !important; }
+#reviews article .bg-\[\#FFF4CC\] { background: #fff1bf !important; color: #171717 !important; }
+#reviews article .bg-\[\#EEF7F1\] { background: #eef8ef !important; color: #19723a !important; }
+#reviews article .border-\[\#DDE4EF\], #reviews article .border-\[\#E8EDF5\] { border-color: #e5e5e5 !important; }
+#reviews article .text-\[\#64748B\], #reviews article .text-\[\#475569\], #reviews article .text-\[\#94A3B8\] { color: #666 !important; }
+footer { background: #171717 !important; }
+
+button, a { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid rgba(255, 201, 40, .45) !important; outline-offset: 2px; }
+
+@media (max-width: 639px) {
+  #book > div { padding: 16px !important; }
+  #book { margin-bottom: -16px !important; }
+  main { padding-bottom: 48px; }
+  .fleet-scroll { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 14px; margin-right: -20px; padding: 0 20px 12px 0; scrollbar-width: thin; }
+  .fleet-scroll > article { min-width: min(84vw, 330px); scroll-snap-align: start; }
 }
 
 /* Give the main menu the confident, readable scale of a travel brand. */
