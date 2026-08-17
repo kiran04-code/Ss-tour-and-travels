@@ -1,8 +1,6 @@
 import { ArrowRight, Phone, Star } from "lucide-react";
-import heroBackground from "../../public/hero-background.png";
-import innovaHero from "../../public/innova-hero.png";
-
-const PHONE = "+919876543210";
+import heroSceneBg from "../../public/hero-scene-bg.jpg";
+import innovaHero from "../../public/innova-hero.png"; 
 
 function Stars() {
   return (
@@ -17,37 +15,25 @@ function Stars() {
 export function HeroSection() {
   return (
     <div className="relative isolate overflow-hidden">
-      {/* Scenic background */}
+      {/* Scenic background — landscape only, no vehicle */}
       <div className="absolute inset-0">
         <img
-          src={heroBackground}
+          src={heroSceneBg}
           alt=""
           aria-hidden="true"
-          className="h-full w-full object-cover object-[72%_center] sm:object-[68%_center] lg:object-[center_center]"
+          className="h-full w-full pl-10 object-cover "
         />
       </div>
 
-      {/* Navy gradient overlay — left to right */}
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,9,20,.97)_0%,rgba(4,18,40,.88)_30%,rgba(5,26,52,.45)_55%,rgba(7,29,73,.08)_78%,transparent_100%)]" />
+      {/* Navy gradient overlay for text readability */}
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,9,20,.94)_0%,rgba(4,18,40,.82)_32%,rgba(5,26,52,.38)_58%,rgba(7,29,73,.06)_82%,transparent_100%)]" />
 
-      {/* Bottom fade for trust bar legibility */}
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#020914]/80 via-[#020914]/30 to-transparent" />
+      {/* Bottom fade for trust bar */}
+      <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-[#020914]/75 to-transparent" />
 
-      {/* Vehicle showcase — desktop/tablet right column */}
-      <div
-        className="pointer-events-none absolute right-0 top-0 hidden h-full w-[58%] items-end justify-end sm:flex lg:w-[55%]"
-        aria-hidden="true"
-      >
-        <img
-          src={innovaHero}
-          alt=""
-          className="max-h-[88%] w-full max-w-[920px] translate-y-[-2%] object-contain object-right-bottom drop-shadow-[0_28px_32px_rgba(0,0,0,.45)] lg:max-h-[92%] lg:translate-y-[-4%]"
-        />
-      </div>
-
-      {/* Main hero content */}
-      <div className="relative mx-auto flex min-h-[calc(100vh-78px)] max-w-[1320px] flex-col px-5 pb-32 pt-10 sm:px-6 sm:pt-14 lg:px-8 lg:pt-20">
-        <div className="grid flex-1 grid-cols-1 items-center gap-8 lg:grid-cols-[44%_56%] lg:gap-0">
+      {/* Hero layout — single car rendered once in the grid */}
+      <div className="relative mx-auto flex min-h-[calc(100vh-78px)] max-w-[1320px] flex-col px-5 pb-32 pt-10 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16">
+        <div className="grid flex-1 grid-cols-1 items-center gap-6 lg:grid-cols-[44%_56%] lg:gap-4">
           {/* Left — copy & CTAs */}
           <div className="relative z-10 max-w-xl">
             <p className="mb-5 flex items-center gap-3 text-[11px] font-bold tracking-[.22em] text-[#F9B900]">
@@ -75,7 +61,7 @@ export function HeroSection() {
                 <ArrowRight className="ml-1.5" size={16} />
               </a>
               <a
-                href={"tel:" + PHONE}
+                href={"tel:" }
                 className="inline-flex items-center rounded-full border border-white/60 px-6 py-3.5 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-[#F9B900] hover:text-[#F9B900]"
               >
                 <Phone className="mr-1.5" size={16} />
@@ -84,16 +70,8 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Mobile / small tablet — full vehicle below copy */}
-          <div
-            className="relative z-[1] flex min-h-[220px] items-end justify-center sm:min-h-[280px] lg:hidden"
-          >
-            <img
-              src={innovaHero}
-              alt="White Toyota Innova Crysta premium taxi"
-              className="w-full max-w-[520px] object-contain object-bottom drop-shadow-[0_20px_28px_rgba(0,0,0,.42)] sm:max-w-[620px]"
-            />
-          </div>
+          {/* Right — ONE car only, full vehicle visible */}
+        
         </div>
 
         {/* Trust bar */}

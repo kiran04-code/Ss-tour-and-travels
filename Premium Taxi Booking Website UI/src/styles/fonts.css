@@ -29,67 +29,9 @@ header {
   #home > div:last-child > div:last-child {
     grid-column: span 2 / span 2;
   }
-}
 
-/* Fleet cards: a consistent vehicle canvas keeps every car fully visible. */
-#cars article {
-  overflow: hidden;
-  border-color: #d7e0ec;
-  background: #fff;
-  box-shadow: 0 10px 28px rgba(7, 29, 73, .06);
-}
-
-#cars article:hover {
-  box-shadow: 0 18px 38px rgba(7, 29, 73, .15);
-}
-
-#cars article > div:first-child {
-  display: flex;
-  aspect-ratio: 16 / 10;
-  height: auto;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(145deg, #eef3f9, #dce7f3);
-}
-
-#cars article > div:first-child > img {
-  height: 100% !important;
-  width: 100%;
-  object-fit: contain !important;
-  padding: 12px;
-  mix-blend-mode: multiply;
-}
-
-#cars article > div:first-child > b {
-  left: 12px;
-  top: 12px;
-  z-index: 1;
-  box-shadow: 3px 3px 0 rgba(7, 29, 73, .16);
-}
-
-#cars article > div:last-child {
-  padding: 20px;
-}
-
-#cars article button {
-  transition: transform .2s ease, background-color .2s ease, color .2s ease;
-}
-
-#cars article button:hover {
-  transform: translateY(-2px);
-}
-
-@media (max-width: 639px) {
   #cars {
     padding-top: 72px;
     padding-bottom: 72px;
-  }
-
-  #cars article > div:first-child {
-    aspect-ratio: 16 / 9;
-  }
-
-  #cars article > div:first-child > img {
-    padding: 10px;
   }
 }
