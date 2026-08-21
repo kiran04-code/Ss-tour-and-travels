@@ -90,30 +90,47 @@ export default function App() {
         e.preventDefault();
         const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
         const submissionChannel = submitter?.value === "whatsapp" ? "whatsapp" : "website";
-        const whatsappWindow = submissionChannel === "whatsapp" ? window.open("", "_blank") : null;
-        const mobile = quote.mobile.replace(/\s|-/g, "");
-        if (!/^[6-9]\d{9}$/.test(mobile)) { whatsappWindow?.close(); return; }
+        const mobile = quote.mobile.replace(/\D/g, "").slice(-10);
+        if (!/^[6-9]\d{9}$/.test(mobile)) { setQuoteError("Please enter a valid 10-digit Indian mobile number starting with 6-9."); return; }
         const selectedCar = cars.find((item) => item.id === quote.car);
-        if (!selectedCar?.id) { whatsappWindow?.close(); setQuoteError("Please select an available car before sending your request."); return; }
+        if (!selectedCar?.id) { setQuoteError("Please select an available car before sending your request."); return; }
+
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const waText = `*Taxi Booking Request - SS Tours & Travels*\n\n📍 *Route:* ${quote.pickup.trim()} ➔ ${quote.drop.trim()}\n📅 *Travel Date:* ${quote.date}\n🚘 *Car:* ${selectedCar.name}\n\n👤 *Client Name:* ${quote.name.trim()}\n📞 *Mobile Number:* +91 ${mobile}\n\n_Please confirm taxi availability and fare quote._`;
+        const directWaUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(waText)}`;
+
+        if (submissionChannel === "whatsapp") {
+            void quoteApi.createQuote({
+                carId: selectedCar.id,
+                customerName: quote.name.trim(),
+                customerPhone: `+91${mobile}`,
+                customerEmail: quote.email.trim() || undefined,
+                message: `Taxi journey: ${quote.pickup.trim()} to ${quote.drop.trim()} on ${quote.date}. Preferred car: ${selectedCar.name}.`,
+                preferredContactMethod: "whatsapp",
+            }).catch(() => {});
+
+            if (isMobile) {
+                window.location.href = directWaUrl;
+            } else {
+                window.open(directWaUrl, "_blank", "noopener,noreferrer");
+            }
+            setConfirmedQuote({ ...quote, mobile });
+            return;
+        }
+
         setIsSubmitting(true);
         setQuoteError("");
         try {
-            const submittedQuote = await quoteApi.createQuote({
+            await quoteApi.createQuote({
                 carId: selectedCar.id,
                 customerName: quote.name.trim(),
-                customerPhone: mobile,
+                customerPhone: `+91${mobile}`,
                 customerEmail: quote.email.trim() || undefined,
                 message: `Taxi journey: ${quote.pickup.trim()} to ${quote.drop.trim()} on ${quote.date}. Preferred car: ${selectedCar.name}.`,
-                preferredContactMethod: submissionChannel === "whatsapp" ? "whatsapp" : "phone",
+                preferredContactMethod: "phone",
             });
-            if (submissionChannel === "whatsapp") {
-                if (!submittedQuote.whatsappUrl) throw new Error("WhatsApp requests are not configured. Please use Send via Website instead.");
-                if (whatsappWindow) { whatsappWindow.opener = null; whatsappWindow.location.href = submittedQuote.whatsappUrl; }
-                else window.open(submittedQuote.whatsappUrl, "_blank", "noopener,noreferrer");
-            }
             setConfirmedQuote({ ...quote, mobile });
         } catch (error) {
-            whatsappWindow?.close();
             setQuoteError((error as Error).message || "We could not send your quote request. Please try again.");
         } finally {
             setIsSubmitting(false);
@@ -126,7 +143,7 @@ export default function App() {
         <main>
             <section id="home" className="relative isolate overflow-hidden bg-[#071D49] pt-[74px] sm:pt-[80px] lg:pt-[86px] text-white">
                 <HeroSection />
-                <div id="book" className="relative z-10 mt-5 mx-auto -mb-12 max-w-[1120px] px-4 sm:px-5"><div className="bg-white p-4 shadow-[0_20px_55px_rgba(0,0,0,.22)] sm:p-7">{confirmedQuote ? <div className="bg-[#071D49] py-8 text-center text-white"><span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#F9B900] text-[#071D49]"><Check size={27} /></span><h2 className="mt-4 text-2xl font-extrabold text-white">Quote Request Received!</h2><p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-white/85">Thank you, <b className="text-white">{confirmedQuote.name}</b>. Your request has been sent to the quote team. We will contact you shortly on <b className="text-white">{confirmedQuote.mobile}</b>.</p><div className="mt-6 flex flex-wrap justify-center gap-3"><a href={"tel:" + PHONE} className="bg-[#F9B900] px-5 py-3 text-sm font-bold text-[#071D49]"><Phone className="mr-1.5 inline" size={16} />Call Now</a><a href={"https://wa.me/" + WHATSAPP_PHONE} className="border border-white/70 px-5 py-3 text-sm font-bold text-white">WhatsApp</a><button onClick={() => { setConfirmedQuote(null); setQuote({ name: "", mobile: "", email: "", pickup: "", drop: "", date: "", car: "" }) }} className="px-4 py-3 text-sm font-bold text-white/85">New request</button></div></div> : <form onSubmit={submit} className="grid gap-4 md:grid-cols-3"><div className="md:col-span-3"><p className="text-xl font-extrabold">Book your taxi</p><p className="mt-1 text-sm text-[#64748B]">Share your journey details and receive a tailored quote.</p></div>{[["name", "Full Name", "text", true], ["mobile", "Mobile Number", "tel", true], ["email", "Email Address", "email", false], ["pickup", "Pickup Location", "text", true], ["drop", "Drop Location", "text", true], ["date", "Travel Date", "date", true]].map(([n, p, t, req]) => <label key={n as string}><span className="mb-1 block text-[10px] font-bold uppercase tracking-[.14em] text-[#64748B]">{p as string} {req ? <span className="text-[#B42318] font-extrabold">*</span> : <span className="text-[9px] font-normal lowercase tracking-normal text-[#94A3B8]">(optional)</span>}</span><input required={Boolean(req)} type={t as string} name={n as string} value={quote[n as keyof typeof quote]} onChange={e => setQuote(x => ({ ...x, [n as string]: e.target.value }))} pattern={n === "mobile" ? "[6-9][0-9]{9}" : undefined} title={n === "mobile" ? "Enter a valid 10-digit Indian mobile number" : undefined} placeholder={n === "mobile" ? "+91" : n === "email" ? "name@example.com" : undefined} className="w-full border-b border-[#CBD5E1] bg-[#F7F9FC] px-3 py-3 text-sm outline-none focus:border-[#F9B900]" /></label>)}<label><span className="mb-1 block text-[10px] font-bold uppercase tracking-[.14em] text-[#64748B]">Preferred Car <span className="text-[#B42318] font-extrabold">*</span></span><select required value={quote.car} onChange={e => setQuote(x => ({ ...x, car: e.target.value }))} className="w-full border-b border-[#CBD5E1] bg-[#F7F9FC] px-3 py-3 text-sm outline-none focus:border-[#F9B900]"><option value="">Select a car</option>{cars.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label><div className="grid gap-2 sm:grid-cols-2"><button name="submissionChannel" value="website" disabled={isSubmitting} className="flex items-center justify-center bg-[#071D49] px-4 py-3.5 text-sm font-bold text-white transition hover:bg-[#F9B900] hover:text-[#071D49] disabled:cursor-wait disabled:opacity-70">{isSubmitting ? <><Loader2 className="mr-2 animate-spin" size={16} />Sending...</> : <>Send via Website <ArrowRight className="ml-1" size={16} /></>}</button><button name="submissionChannel" value="whatsapp" disabled={isSubmitting} className="flex items-center justify-center bg-[#25D366] px-4 py-3.5 text-sm font-bold text-[#073B20] transition hover:bg-[#1fbd5a] disabled:cursor-wait disabled:opacity-70">{isSubmitting ? <><Loader2 className="mr-2 animate-spin" size={16} />Sending...</> : <><MessageCircle className="mr-1" size={16} />Send on WhatsApp</>}</button></div>{quoteError && <p role="alert" className="md:col-span-3 text-sm font-semibold text-[#B42318]">{quoteError}</p>}</form>}</div>
+                <div id="book" className="relative z-10 mt-5 mx-auto -mb-12 max-w-[1120px] px-4 sm:px-5"><div className="bg-white p-4 shadow-[0_20px_55px_rgba(0,0,0,.22)] sm:p-7">{confirmedQuote ? <div className="bg-[#071D49] py-8 text-center text-white"><span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#F9B900] text-[#071D49]"><Check size={27} /></span><h2 className="mt-4 text-2xl font-extrabold text-white">Quote Request Received!</h2><p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-white/85">Thank you, <b className="text-white">{confirmedQuote.name}</b>. Your request has been sent to the quote team. We will contact you shortly on <b className="text-white">+91 {confirmedQuote.mobile}</b>.</p><div className="mt-6 flex flex-wrap justify-center gap-3"><a href={"tel:" + PHONE} className="bg-[#F9B900] px-5 py-3 text-sm font-bold text-[#071D49]"><Phone className="mr-1.5 inline" size={16} />Call Now</a><a href={"https://wa.me/" + WHATSAPP_PHONE} className="border border-white/70 px-5 py-3 text-sm font-bold text-white">WhatsApp</a><button onClick={() => { setConfirmedQuote(null); setQuote({ name: "", mobile: "", email: "", pickup: "", drop: "", date: "", car: "" }) }} className="px-4 py-3 text-sm font-bold text-white/85">New request</button></div></div> : <form onSubmit={submit} className="grid gap-4 md:grid-cols-3"><div className="md:col-span-3"><p className="text-xl font-extrabold">Book your taxi</p><p className="mt-1 text-sm text-[#64748B]">Share your journey details and receive a tailored quote.</p></div>{[["name", "Full Name", "text", true], ["mobile", "Mobile Number", "tel", true], ["email", "Email Address", "email", false], ["pickup", "Pickup Location", "text", true], ["drop", "Drop Location", "text", true], ["date", "Travel Date", "date", true]].map(([n, p, t, req]) => <label key={n as string}><span className="mb-1 block text-[10px] font-bold uppercase tracking-[.14em] text-[#64748B]">{p as string} {req ? <span className="text-[#B42318] font-extrabold">*</span> : <span className="text-[9px] font-normal lowercase tracking-normal text-[#94A3B8]">(optional)</span>}</span>{n === "mobile" ? <div className="flex border-b border-[#CBD5E1] bg-[#F7F9FC] focus-within:border-[#F9B900]"><span className="flex items-center bg-[#E2E8F0]/75 px-2.5 text-xs font-bold text-[#071D49] border-r border-[#CBD5E1] select-none">+91</span><input required={Boolean(req)} type="tel" maxLength={10} name="mobile" value={quote.mobile} onChange={e => { let val = e.target.value.replace(/\D/g, ""); if (val.startsWith("91") && val.length > 10) val = val.slice(2); if (val.startsWith("0")) val = val.slice(1); setQuote(x => ({ ...x, mobile: val.slice(0, 10) })) }} pattern="[6-9][0-9]{9}" title="Enter a valid 10-digit Indian mobile number" placeholder="98765 43210" className="w-full bg-transparent px-3 py-3 text-sm outline-none font-semibold text-[#071D49]" /></div> : <input required={Boolean(req)} type={t as string} name={n as string} value={quote[n as keyof typeof quote]} onChange={e => setQuote(x => ({ ...x, [n as string]: e.target.value }))} placeholder={n === "email" ? "name@example.com" : undefined} className="w-full border-b border-[#CBD5E1] bg-[#F7F9FC] px-3 py-3 text-sm outline-none focus:border-[#F9B900]" />}</label>)}<label><span className="mb-1 block text-[10px] font-bold uppercase tracking-[.14em] text-[#64748B]">Preferred Car <span className="text-[#B42318] font-extrabold">*</span></span><select required value={quote.car} onChange={e => setQuote(x => ({ ...x, car: e.target.value }))} className="w-full border-b border-[#CBD5E1] bg-[#F7F9FC] px-3 py-3 text-sm outline-none focus:border-[#F9B900]"><option value="">Select a car</option>{cars.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label><div className="grid gap-2 sm:grid-cols-2"><button name="submissionChannel" value="website" disabled={isSubmitting} className="flex items-center justify-center bg-[#071D49] px-4 py-3.5 text-sm font-bold text-white transition hover:bg-[#F9B900] hover:text-[#071D49] disabled:cursor-wait disabled:opacity-70">{isSubmitting ? <><Loader2 className="mr-2 animate-spin" size={16} />Sending...</> : <>Send via Website <ArrowRight className="ml-1" size={16} /></>}</button><button name="submissionChannel" value="whatsapp" disabled={isSubmitting} className="flex items-center justify-center bg-[#25D366] px-4 py-3.5 text-sm font-bold text-[#073B20] transition hover:bg-[#1fbd5a] disabled:cursor-wait disabled:opacity-70">{isSubmitting ? <><Loader2 className="mr-2 animate-spin" size={16} />Sending...</> : <><MessageCircle className="mr-1" size={16} />Send on WhatsApp</>}</button></div>{quoteError && <p role="alert" className="md:col-span-3 text-sm font-semibold text-[#B42318]">{quoteError}</p>}</form>}</div>
                 </div>
                 <div className="relative mt-22 grid border-t border-white/10 bg-[#051533] text-white sm:grid-cols-5">
                 </div>

@@ -45,49 +45,58 @@ export function DestinationsSection() {
 
   const handleSubmit = async (e: React.FormEvent, channel: "website" | "whatsapp") => {
     e.preventDefault();
-    const cleanPhone = formData.phone.replace(/\s|-/g, "");
+    const cleanPhone = formData.phone.replace(/\D/g, "").slice(-10);
 
     if (!formData.name.trim()) {
       setErrorMessage("Please enter your name.");
       return;
     }
     if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
-      setErrorMessage("Please enter a valid 10-digit mobile number.");
+      setErrorMessage("Please enter a valid 10-digit Indian mobile number starting with 6-9.");
       return;
     }
 
     setSubmitting(true);
     setErrorMessage("");
 
-    const whatsappTab = channel === "whatsapp" ? window.open("", "_blank") : null;
-    const destString = selected.length ? selected.map(p => p.name).join(" → ") : "Solapur Sightseeing";
+    const destString = selected.length ? selected.map(p => p.name).join(" → ") : "Solapur Sightseeing Tour";
+    const messageText = `Multi-Destination Tour: Solapur to ${destString}. Travel Date: ${formData.date}${formData.returnDate ? `, Return: ${formData.returnDate}` : ""}. Passengers: ${formData.passengers}. Car Type: ${formData.carType}. Requirements: ${formData.requirements || "None"}.`;
+    const waMsg = `*Multi-Stop Tour Quote Request - SS Tours & Travels*\n\n📍 *Route:* Solapur ➔ ${destString}\n📅 *Travel Date:* ${formData.date}\n👥 *Passengers:* ${formData.passengers}\n🚘 *Car Preference:* ${formData.carType}\n\n👤 *Client Name:* ${formData.name.trim()}\n📞 *Mobile Number:* +91 ${cleanPhone}\n\n_Please send custom itinerary quote and taxi availability._`;
+    const directUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(waMsg)}`;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    try {
-      const messageText = `Multi-Destination Tour: Solapur to ${destString}. Travel Date: ${formData.date}${formData.returnDate ? `, Return: ${formData.returnDate}` : ""}. Passengers: ${formData.passengers}. Car Type: ${formData.carType}. Requirements: ${formData.requirements || "None"}.`;
-
-      const res = await quoteApi.createQuote({
+    if (channel === "whatsapp") {
+      void quoteApi.createQuote({
         carId: "default",
         customerName: formData.name.trim(),
-        customerPhone: cleanPhone,
+        customerPhone: `+91${cleanPhone}`,
         customerEmail: formData.email.trim() || undefined,
         message: messageText,
-        preferredContactMethod: channel === "whatsapp" ? "whatsapp" : "phone"
-      });
+        preferredContactMethod: "whatsapp"
+      }).catch(() => {});
 
-      if (channel === "whatsapp") {
-        const waMsg = `*Multi-Stop Tour Quote Request - SS Tours & Travels*\n\n📍 *Route:* Solapur ➔ ${destString}\n📅 *Travel Date:* ${formData.date}\n👥 *Passengers:* ${formData.passengers}\n🚘 *Car Preference:* ${formData.carType}\n\n👤 *Client Name:* ${formData.name.trim()}\n📞 *Mobile:* ${cleanPhone}\n\n_Please send custom itinerary quote and taxi availability._`;
-        const directUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(waMsg)}`;
-        if (whatsappTab) {
-          whatsappTab.opener = null;
-          whatsappTab.location.href = res.whatsappUrl || directUrl;
-        } else {
-          window.open(res.whatsappUrl || directUrl, "_blank", "noopener,noreferrer");
-        }
+      if (isMobile) {
+        window.location.href = directUrl;
+      } else {
+        window.open(directUrl, "_blank", "noopener,noreferrer");
       }
+      setSubmitting(false);
+      setSubmitted(true);
+      return;
+    }
+
+    try {
+      await quoteApi.createQuote({
+        carId: "default",
+        customerName: formData.name.trim(),
+        customerPhone: `+91${cleanPhone}`,
+        customerEmail: formData.email.trim() || undefined,
+        message: messageText,
+        preferredContactMethod: "phone"
+      });
 
       setSubmitted(true);
     } catch (err) {
-      if (whatsappTab) whatsappTab.close();
       setErrorMessage((err as Error).message || "Could not send quote request. Please try again.");
     } finally {
       setSubmitting(false);
@@ -281,16 +290,27 @@ export function DestinationsSection() {
 
                   <label className="text-xs font-bold text-[#071D49]">
                     Mobile / WhatsApp <span className="text-[#B42318]">*</span>
-                    <input
-                      required
-                      type="tel"
-                      pattern="[6-9][0-9]{9}"
-                      title="10-digit mobile number"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="98765 43210"
-                      className="mt-1 w-full rounded-lg border border-[#D8E1EE] bg-[#F7F9FC] px-3 py-2.5 text-sm font-normal outline-none focus:border-[#F9B900]"
-                    />
+                    <div className="relative mt-1 flex rounded-lg border border-[#D8E1EE] bg-[#F7F9FC] overflow-hidden focus-within:border-[#F9B900] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#F9B900]/20">
+                      <span className="flex items-center bg-[#E2E8F0]/75 px-2.5 text-xs font-bold text-[#071D49] border-r border-[#D8E1EE] select-none">
+                        +91
+                      </span>
+                      <input
+                        required
+                        type="tel"
+                        maxLength={10}
+                        pattern="[6-9][0-9]{9}"
+                        title="10-digit mobile number"
+                        value={formData.phone}
+                        onChange={(e) => {
+                          let val = e.target.value.replace(/\D/g, "");
+                          if (val.startsWith("91") && val.length > 10) val = val.slice(2);
+                          if (val.startsWith("0")) val = val.slice(1);
+                          setFormData({ ...formData, phone: val.slice(0, 10) });
+                        }}
+                        placeholder="98765 43210"
+                        className="w-full bg-transparent px-3 py-2.5 text-sm font-semibold text-[#071D49] outline-none"
+                      />
+                    </div>
                   </label>
 
                   <label className="text-xs font-bold text-[#071D49]">

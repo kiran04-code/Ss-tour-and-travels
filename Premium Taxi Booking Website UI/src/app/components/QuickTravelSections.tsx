@@ -96,7 +96,7 @@ export function QuickTravelSections() {
 
   const handleBookingSubmit = async (e: React.FormEvent, channel: "website" | "whatsapp") => {
     e.preventDefault();
-    const cleanPhone = form.phone.replace(/\s|-/g, "");
+    const cleanPhone = form.phone.replace(/\D/g, "").slice(-10);
 
     if (!form.name.trim()) {
       setErrorMessage("Please enter your name.");
@@ -104,7 +104,7 @@ export function QuickTravelSections() {
     }
 
     if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
-      setErrorMessage("Please enter a valid 10-digit mobile number.");
+      setErrorMessage("Please enter a valid 10-digit mobile number starting with 6-9.");
       return;
     }
 
@@ -116,35 +116,43 @@ export function QuickTravelSections() {
     setSubmitting(true);
     setErrorMessage("");
 
-    // Open WhatsApp tab synchronously if needed
-    const whatsappTab = channel === "whatsapp" ? window.open("", "_blank") : null;
+    const journeyMessage = `Route: ${form.pickup.trim()} to ${form.drop.trim()} (${form.tripType}) on ${form.date}. Preferred: ${form.car}.`;
+    const textMessage = `*Taxi Booking Request - SS Tours & Travels*\n\n📍 *Route:* ${form.pickup.trim()} ➔ ${form.drop.trim()}\n🚗 *Trip Type:* ${form.tripType}\n📅 *Travel Date:* ${form.date}\n🚘 *Vehicle:* ${form.car}\n\n👤 *Client Name:* ${form.name.trim()}\n📞 *Mobile Number:* +91 ${cleanPhone}\n\n_Please confirm taxi availability, fare quote, and driver details._`;
+    const directWaUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(textMessage)}`;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (channel === "whatsapp") {
+      // Create quote record in backend asynchronously in background
+      void quoteApi.createQuote({
+        carId: form.carId || "default",
+        customerName: form.name.trim(),
+        customerPhone: `+91${cleanPhone}`,
+        message: journeyMessage,
+        preferredContactMethod: "whatsapp"
+      }).catch(() => {});
+
+      // Instant direct navigation works 100% on iOS Safari, Android Chrome & Desktop
+      if (isMobile) {
+        window.location.href = directWaUrl;
+      } else {
+        window.open(directWaUrl, "_blank", "noopener,noreferrer");
+      }
+      setSubmitting(false);
+      setSubmitted(true);
+      return;
+    }
 
     try {
-      const journeyMessage = `Route: ${form.pickup.trim()} to ${form.drop.trim()} (${form.tripType}) on ${form.date}. Preferred: ${form.car}.`;
-      
-      const res = await quoteApi.createQuote({
-        carId: "default",
+      await quoteApi.createQuote({
+        carId: form.carId || "default",
         customerName: form.name.trim(),
-        customerPhone: cleanPhone,
+        customerPhone: `+91${cleanPhone}`,
         message: journeyMessage,
-        preferredContactMethod: channel === "whatsapp" ? "whatsapp" : "phone"
+        preferredContactMethod: "phone"
       });
-
-      if (channel === "whatsapp") {
-        const textMessage = `*Taxi Booking Request - SS Tours & Travels*\n\n📍 *Route:* ${form.pickup.trim()} ➔ ${form.drop.trim()}\n🚗 *Trip Type:* ${form.tripType}\n📅 *Travel Date:* ${form.date}\n🚘 *Vehicle:* ${form.car}\n\n👤 *Client Name:* ${form.name.trim()}\n📞 *Mobile Number:* ${cleanPhone}\n\n_Please confirm taxi availability, fare quote, and driver details._`;
-        const directWaUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(textMessage)}`;
-        
-        if (whatsappTab) {
-          whatsappTab.opener = null;
-          whatsappTab.location.href = res.whatsappUrl || directWaUrl;
-        } else {
-          window.open(res.whatsappUrl || directWaUrl, "_blank", "noopener,noreferrer");
-        }
-      }
 
       setSubmitted(true);
     } catch (err) {
-      if (whatsappTab) whatsappTab.close();
       setErrorMessage((err as Error).message || "Could not submit booking request. Please try again or call directly.");
     } finally {
       setSubmitting(false);
@@ -368,16 +376,27 @@ export function QuickTravelSections() {
                     <span className="flex items-center gap-1 text-[11px] font-bold text-[#475569]">
                       <Phone size={12} className="text-[#9a7100]" /> Mobile / WhatsApp <span className="text-[#B42318]">*</span>
                     </span>
-                    <input
-                      required
-                      type="tel"
-                      pattern="[6-9][0-9]{9}"
-                      title="Enter 10 digit Indian mobile number"
-                      value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      placeholder="98765 43210"
-                      className="mt-1 w-full rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] px-3 py-2 text-xs font-semibold text-[#071D49] outline-none transition focus:border-[#F9B900] focus:bg-white"
-                    />
+                    <div className="relative mt-1 flex rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] overflow-hidden focus-within:border-[#F9B900] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#F9B900]/20">
+                      <span className="flex items-center bg-[#E2E8F0]/75 px-2.5 text-xs font-bold text-[#071D49] border-r border-[#CBD5E1] select-none">
+                        +91
+                      </span>
+                      <input
+                        required
+                        type="tel"
+                        maxLength={10}
+                        pattern="[6-9][0-9]{9}"
+                        title="Enter 10 digit Indian mobile number"
+                        value={form.phone}
+                        onChange={(e) => {
+                          let val = e.target.value.replace(/\D/g, "");
+                          if (val.startsWith("91") && val.length > 10) val = val.slice(2);
+                          if (val.startsWith("0")) val = val.slice(1);
+                          setForm({ ...form, phone: val.slice(0, 10) });
+                        }}
+                        placeholder="98765 43210"
+                        className="w-full bg-transparent px-3 py-2 text-xs font-semibold text-[#071D49] outline-none"
+                      />
+                    </div>
                   </label>
                 </div>
 
