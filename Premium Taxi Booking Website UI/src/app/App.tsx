@@ -5,19 +5,21 @@ import image1 from "../public/image1.png";
 import image2 from "../public/image2.jpg";
 import image3 from "../public/image3.png";
 import { DestinationsSection } from "./components/DestinationsSection";
-import { FleetCard } from "./components/FleetCard";
+import { FleetCard, type FleetCar } from "./components/FleetCard";
 import { HeroSection } from "./components/HeroSection";
 import { GallerySection } from "./components/GallerySection";
+import { GoogleReviewsSection, OfficeLocationSection } from "./components/BusinessSections";
+import { SocialLinks } from "./components/SocialLinks";
 import { QuickTravelSections } from "./components/QuickTravelSections";
-import dzireImg from "../public/dzire-car.jpg";
-import ertigaImg from "../public/ertiga-hero.webp";
-import innovaImg from "../public/innova-hero.png";
+import { OperationsRouter } from "./OperationsRouter";
+import { carApi } from "../api/carApi";
+import { quoteApi } from "../api/quoteApi";
+import type { Car as DatabaseCar } from "../api/types";
 const PHONE = "+919876543210";
-const cars = [
-    { name: "Maruti Dzire", type: "Executive Sedan", seats: "4 passengers", rate: "\u20B912/km", tag: "Popular", img: dzireImg },
-    { name: "Maruti Ertiga", type: "Family MPV", seats: "6 passengers", rate: "\u20B914/km", tag: "New", img: ertigaImg },
-    { name: "Toyota Innova Crysta", type: "Comfort SUV", seats: "7 passengers", rate: "\u20B918/km", tag: "Best Seller", img: innovaImg }
-];
+const WHATSAPP_PHONE = "9197774025744";
+function toFleetCar(car: DatabaseCar): FleetCar {
+  return { id: car._id, name: car.name, type: `${car.brand} · ${car.model}`, seats: `${car.fuelType} · ${car.transmission}`, tag: "DB Listing", img: car.images[0] || "", status: car.status };
+}
 const reviews = [
   [
     "Priya Kulkarni",
@@ -50,38 +52,68 @@ const reviews = [
 function Logo() { return <a href="#home" className="flex h-16 items-center" aria-label="SS Tours and Travels home"><img src={logo} alt="SS Tours & Travels" className="h-full w-auto max-w-[280px] object-contain object-left" /></a> }
 function Stars() { return <span className="inline-flex gap-0.5 text-[#F9B900]">{[1, 2, 3, 4, 5].map(i => <Star key={i} size={13} fill="currentColor" />)}</span> }
 export default function App() {
-    const [menu, setMenu] = useState(false), [scrolled, setScrolled] = useState(false), [car, setCar] = useState<typeof cars[0] | null>(null), [review, setReview] = useState(false), [sent, setSent] = useState(false);
-    const [quote, setQuote] = useState({ name: "", mobile: "", pickup: "", drop: "", date: "", car: "" });
-    const [isSubmitting, setIsSubmitting] = useState(false), [confirmedQuote, setConfirmedQuote] = useState<typeof quote | null>(null);
-    const submit = (e: React.FormEvent) => {
+    const [menu, setMenu] = useState(false), [scrolled, setScrolled] = useState(false), [car, setCar] = useState<FleetCar | null>(null), [review, setReview] = useState(false), [sent, setSent] = useState(false);
+    const [cars, setCars] = useState<FleetCar[]>([]), [fleetLoading, setFleetLoading] = useState(true), [fleetError, setFleetError] = useState("");
+    const [quote, setQuote] = useState({ name: "", mobile: "", email: "", pickup: "", drop: "", date: "", car: "" });
+    const [isSubmitting, setIsSubmitting] = useState(false), [confirmedQuote, setConfirmedQuote] = useState<typeof quote | null>(null), [quoteError, setQuoteError] = useState("");
+    useEffect(() => { carApi.getCars({ limit: 50 }).then((result) => setCars(result.items.map(toFleetCar))).catch((error: Error) => setFleetError(error.message)).finally(() => setFleetLoading(false)); }, []);
+    if (window.location.pathname !== "/" && window.location.pathname !== "") return <OperationsRouter />;
+    const submit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+        const submissionChannel = submitter?.value === "whatsapp" ? "whatsapp" : "website";
+        // Opening the window directly from the button interaction prevents popup blockers
+        // from blocking the WhatsApp page after the API request completes.
+        const whatsappWindow = submissionChannel === "whatsapp" ? window.open("", "_blank") : null;
         const mobile = quote.mobile.replace(/\s|-/g, "");
-        if (!/^[6-9]\d{9}$/.test(mobile)) return;
+        if (!/^[6-9]\d{9}$/.test(mobile)) { whatsappWindow?.close(); return; }
+        const selectedCar = cars.find((item) => item.id === quote.car);
+        if (!selectedCar?.id) { whatsappWindow?.close(); setQuoteError("Please select an available car before sending your request."); return; }
         setIsSubmitting(true);
-        const request = { customerName: quote.name.trim(), mobileNumber: mobile, pickupLocation: quote.pickup.trim(), dropLocation: quote.drop.trim(), travelDate: quote.date, preferredCar: quote.car, createdAt: new Date().toISOString() };
-        window.setTimeout(() => {
-            const saved = JSON.parse(localStorage.getItem("ssToursQuoteRequests") || "[]");
-            localStorage.setItem("ssToursQuoteRequests", JSON.stringify([...saved, request]));
+        setQuoteError("");
+        try {
+            const submittedQuote = await quoteApi.createQuote({
+                carId: selectedCar.id,
+                customerName: quote.name.trim(),
+                customerPhone: mobile,
+                customerEmail: quote.email.trim(),
+                message: `Taxi journey: ${quote.pickup.trim()} to ${quote.drop.trim()} on ${quote.date}. Preferred car: ${selectedCar.name}.`,
+                preferredContactMethod: submissionChannel === "whatsapp" ? "whatsapp" : "phone",
+            });
+            if (submissionChannel === "whatsapp") {
+                if (!submittedQuote.whatsappUrl) throw new Error("WhatsApp requests are not configured. Please use Send via Website instead.");
+                if (whatsappWindow) { whatsappWindow.opener = null; whatsappWindow.location.href = submittedQuote.whatsappUrl; }
+                else window.open(submittedQuote.whatsappUrl, "_blank", "noopener,noreferrer");
+            }
             setConfirmedQuote({ ...quote, mobile });
+        } catch (error) {
+            whatsappWindow?.close();
+            setQuoteError((error as Error).message || "We could not send your quote request. Please try again.");
+        } finally {
             setIsSubmitting(false);
-        }, 700);
+        }
     };
     useEffect(() => { const onScroll = () => setScrolled(window.scrollY > 20); onScroll(); window.addEventListener("scroll", onScroll, { passive: true }); return () => window.removeEventListener("scroll", onScroll) }, []);
     const links = [["Home", "#home"], ["About Us", "#experience"], ["Our Cars", "#cars"], ["Outstation", "#book"], ["Airport Transfer", "#book"], ["Solapur Local", "#book"], ["Contact", "#contact"]];
     return <div className="min-h-screen overflow-x-hidden bg-[#F7F9FC] text-[#071D49]">
-        <header style={{ fontFamily: "Teachers, sans-serif" }} className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${scrolled ? "border-white/10 bg-[#071D49]/98 shadow-[0_8px_28px_rgba(0,0,0,.22)]" : "border-white/10 bg-[#071D49]/35 backdrop-blur-md"}`}><div className="mx-auto flex h-[78px] max-w-[1440px] items-center justify-between px-5 lg:px-8"><Logo /><nav className="hidden h-full items-center gap-5 xl:flex">{links.map(([l, h], index) => <a key={l} href={h} className={`group relative flex h-full items-center text-[12px] font-semibold tracking-[.02em] transition-colors duration-200 hover:text-[#F9B900] ${index === 0 ? "text-[#F9B900]" : "text-white/80"}`}><span>{l}</span><span className={`absolute bottom-0 left-0 h-0.5 bg-[#F9B900] transition-all duration-300 ${index === 0 ? "w-full" : "w-0 group-hover:w-full"}`} /></a>)}</nav><div className="hidden items-center gap-3 xl:flex"><a href={"tel:" + PHONE} className="flex items-center gap-2 border-r border-white/20 pr-4 text-sm font-bold text-white transition-colors hover:text-[#F9B900]"><Phone size={15} className="text-[#F9B900]" /><span className="text-[#F9B900]">Call Now</span><span className="text-white">+91 98765 43210</span></a><a aria-label="Chat on WhatsApp" href={"https://wa.me/" + PHONE.slice(1)} className="grid h-9 w-9 place-items-center border border-white/30 text-white transition-colors hover:border-[#F9B900] hover:bg-[#F9B900] hover:text-[#071D49]"><MessageCircle size={17} /></a></div><div className="flex items-center gap-3 xl:hidden"><a href={"tel:" + PHONE} aria-label="Call now" className="grid h-9 w-9 place-items-center border border-[#F9B900]/70 text-[#F9B900]"><Phone size={16} /></a><button aria-label={menu ? "Close menu" : "Open menu"} className="grid h-9 w-9 place-items-center border border-white/30 text-white transition-colors hover:border-[#F9B900] hover:text-[#F9B900]" onClick={() => setMenu(!menu)}>{menu ? <X size={20} /> : <Menu size={20} />}</button></div></div>{menu && <nav className="border-t border-white/10 bg-[#071D49] px-5 pb-5 pt-2 shadow-2xl xl:hidden">{links.map(([l, h], index) => <a onClick={() => setMenu(false)} key={l} href={h} className={`flex items-center justify-between border-b border-white/10 py-3.5 text-sm font-semibold ${index === 0 ? "text-[#F9B900]" : "text-white/80"}`}><span>{l}</span><ArrowRight size={15} className="text-[#F9B900]" /></a>)}<a onClick={() => setMenu(false)} href="#book" className="mt-4 block bg-[#F9B900] px-4 py-3.5 text-center text-sm font-extrabold text-[#071D49]">Book Your Taxi <ArrowRight className="ml-1 inline" size={15} /></a></nav>}</header>
+        <header style={{ fontFamily: "Teachers, sans-serif" }} className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${scrolled ? "border-white/10 bg-[#071D49]/98 shadow-[0_8px_28px_rgba(0,0,0,.22)]" : "border-white/10 bg-[#071D49]/35 backdrop-blur-md"}`}><div className="mx-auto flex h-[78px] max-w-[1440px] items-center justify-between px-5 lg:px-8"><Logo /><nav className="hidden h-full items-center gap-5 xl:flex">{links.map(([l, h], index) => <a key={l} href={h} className={`group relative flex h-full items-center text-[12px] font-semibold tracking-[.02em] transition-colors duration-200 hover:text-[#F9B900] ${index === 0 ? "text-[#F9B900]" : "text-white/80"}`}><span>{l}</span><span className={`absolute bottom-0 left-0 h-0.5 bg-[#F9B900] transition-all duration-300 ${index === 0 ? "w-full" : "w-0 group-hover:w-full"}`} /></a>)}</nav><div className="hidden items-center gap-3 xl:flex"><a href={"tel:" + PHONE} className="flex items-center gap-2 border-r border-white/20 pr-4 text-sm font-bold text-white transition-colors hover:text-[#F9B900]"><Phone size={15} className="text-[#F9B900]" /><span className="text-[#F9B900]">Call Now</span><span className="text-white">+91 98765 43210</span></a><a aria-label="Chat on WhatsApp" href={"https://wa.me/" + WHATSAPP_PHONE} className="grid h-9 w-9 place-items-center border border-white/30 text-white transition-colors hover:border-[#F9B900] hover:bg-[#F9B900] hover:text-[#071D49]"><MessageCircle size={17} /></a></div><div className="flex items-center gap-3 xl:hidden"><a href={"tel:" + PHONE} aria-label="Call now" className="grid h-9 w-9 place-items-center border border-[#F9B900]/70 text-[#F9B900]"><Phone size={16} /></a><button aria-label={menu ? "Close menu" : "Open menu"} className="grid h-9 w-9 place-items-center border border-white/30 text-white transition-colors hover:border-[#F9B900] hover:text-[#F9B900]" onClick={() => setMenu(!menu)}>{menu ? <X size={20} /> : <Menu size={20} />}</button></div></div>{menu && <nav className="border-t border-white/10 bg-[#071D49] px-5 pb-5 pt-2 shadow-2xl xl:hidden">{links.map(([l, h], index) => <a onClick={() => setMenu(false)} key={l} href={h} className={`flex items-center justify-between border-b border-white/10 py-3.5 text-sm font-semibold ${index === 0 ? "text-[#F9B900]" : "text-white/80"}`}><span>{l}</span><ArrowRight size={15} className="text-[#F9B900]" /></a>)}<a onClick={() => setMenu(false)} href="#book" className="mt-4 block bg-[#F9B900] px-4 py-3.5 text-center text-sm font-extrabold text-[#071D49]">Book Your Taxi <ArrowRight className="ml-1 inline" size={15} /></a></nav>}</header>
         <main>
             <section id="home" className="relative isolate overflow-hidden bg-[#071D49] pt-[78px] text-white">
                 <HeroSection />
-                <div id="book" className="relative z-10 mx-auto -mb-12 max-w-[1120px] px-5"><div className="bg-white p-5 shadow-[0_20px_55px_rgba(0,0,0,.22)] sm:p-7">{confirmedQuote ? <div className="py-5 text-center"><span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#F9B900]"><Check size={27} /></span><h2 className="mt-4 text-2xl font-extrabold">Quote Request Received!</h2><p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-[#64748B]">Thank you, <b className="text-[#071D49]">{confirmedQuote.name}</b>. Our team will contact you shortly on <b className="text-[#071D49]">{confirmedQuote.mobile}</b>.</p><div className="mt-6 flex flex-wrap justify-center gap-3"><a href={"tel:" + PHONE} className="bg-[#071D49] px-5 py-3 text-sm font-bold text-white"><Phone className="mr-1.5 inline" size={16} />Call Now</a><a href={"https://wa.me/" + PHONE.slice(1)} className="border border-[#071D49] px-5 py-3 text-sm font-bold">WhatsApp</a><button onClick={() => { setConfirmedQuote(null); setQuote({ name: "", mobile: "", pickup: "", drop: "", date: "", car: "" }) }} className="px-4 py-3 text-sm font-bold text-[#64748B]">New request</button></div></div> : <form onSubmit={submit} className="grid gap-4 md:grid-cols-3"><div className="md:col-span-3"><p className="text-xl font-extrabold">Book your taxi</p><p className="mt-1 text-sm text-[#64748B]">Share your journey details and receive a tailored quote.</p></div>{[["name", "Full Name", "text"], ["mobile", "Mobile Number", "tel"], ["pickup", "Pickup Location", "text"], ["drop", "Drop Location", "text"], ["date", "Travel Date", "date"]].map(([n, p, t]) => <label key={n}><span className="mb-1 block text-[10px] font-bold uppercase tracking-[.14em] text-[#64748B]">{p}</span><input required type={t} name={n} value={quote[n as keyof typeof quote]} onChange={e => setQuote(x => ({ ...x, [n]: e.target.value }))} pattern={n === "mobile" ? "[6-9][0-9]{9}" : undefined} title={n === "mobile" ? "Enter a valid 10-digit Indian mobile number" : undefined} placeholder={n === "mobile" ? "98765 43210" : undefined} className="w-full border-b border-[#CBD5E1] bg-[#F7F9FC] px-3 py-3 text-sm outline-none focus:border-[#F9B900]" /></label>)}<label><span className="mb-1 block text-[10px] font-bold uppercase tracking-[.14em] text-[#64748B]">Preferred Car</span><select required value={quote.car} onChange={e => setQuote(x => ({ ...x, car: e.target.value }))} className="w-full border-b border-[#CBD5E1] bg-[#F7F9FC] px-3 py-3 text-sm outline-none focus:border-[#F9B900]"><option value="">Select a car</option>{cars.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}</select></label><button disabled={isSubmitting} className="flex items-center justify-center bg-[#071D49] px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[#F9B900] hover:text-[#071D49] disabled:cursor-wait disabled:opacity-70">{isSubmitting ? <><Loader2 className="mr-2 animate-spin" size={16} />Saving request...</> : <>Get Instant Quote <ArrowRight className="ml-1" size={16} /></>}</button></form>}</div></div>
-                <div className="relative mt-22 grid border-t border-white/10 bg-[#051533] text-white sm:grid-cols-5">{[[Clock3, "24/7 Service"], [Users, "Professional Drivers"], [Wind, "Clean Cars"], [Check, "Transparent Pricing"], [ShieldCheck, "Safe Travel"]].map(([I, t]) => { const Icon = I as typeof Clock3; return <div key={t as string} className="flex items-center justify-center gap-2 border-b border-r border-white/10 px-3 py-5 text-xs font-bold"><Icon size={16} className="text-[#F9B900]" />{t}</div> })}</div></section>
-            <section id="cars" className="bg-white py-24"><div className="mx-auto max-w-[1320px] px-5 lg:px-8"><div className="text-center"><p className="text-[11px] font-bold tracking-[.2em] text-[#9a7100]">OUR FLEET</p><h2 className="mt-4 text-4xl font-extrabold sm:text-5xl">Choose your kind of comfort.</h2></div><div className="fleet-scroll mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">{cars.map(c => <FleetCard key={c.name} car={c} onViewDetails={setCar} onBook={setCar} />)}</div></div></section>
+                <div id="book" className="relative z-10 mt-5 mx-auto -mb-12 max-w-[1120px] px-5"><div className="bg-white p-5 shadow-[0_20px_55px_rgba(0,0,0,.22)] sm:p-7">{confirmedQuote ? <div className="bg-[#071D49] py-8 text-center text-white"><span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#F9B900] text-[#071D49]"><Check size={27} /></span><h2 className="mt-4 text-2xl font-extrabold text-white">Quote Request Received!</h2><p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-white/85">Thank you, <b className="text-white">{confirmedQuote.name}</b>. Your request has been sent to the quote team. We will contact you shortly on <b className="text-white">{confirmedQuote.mobile}</b>.</p><div className="mt-6 flex flex-wrap justify-center gap-3"><a href={"tel:" + PHONE} className="bg-[#F9B900] px-5 py-3 text-sm font-bold text-[#071D49]"><Phone className="mr-1.5 inline" size={16} />Call Now</a><a href={"https://wa.me/" + WHATSAPP_PHONE} className="border border-white/70 px-5 py-3 text-sm font-bold text-white">WhatsApp</a><button onClick={() => { setConfirmedQuote(null); setQuote({ name: "", mobile: "", email: "", pickup: "", drop: "", date: "", car: "" }) }} className="px-4 py-3 text-sm font-bold text-white/85">New request</button></div></div> : <form onSubmit={submit} className="grid gap-4 md:grid-cols-3"><div className="md:col-span-3"><p className="text-xl font-extrabold">Book your taxi</p><p className="mt-1 text-sm text-[#64748B]">Share your journey details and receive a tailored quote.</p></div>{[["name", "Full Name", "text"], ["mobile", "Mobile Number", "tel"], ["email", "Email Address", "email"], ["pickup", "Pickup Location", "text"], ["drop", "Drop Location", "text"], ["date", "Travel Date", "date"]].map(([n, p, t]) => <label key={n}><span className="mb-1 block text-[10px] font-bold uppercase tracking-[.14em] text-[#64748B]">{p}</span><input required type={t} name={n} value={quote[n as keyof typeof quote]} onChange={e => setQuote(x => ({ ...x, [n]: e.target.value }))} pattern={n === "mobile" ? "[6-9][0-9]{9}" : undefined} title={n === "mobile" ? "Enter a valid 10-digit Indian mobile number" : undefined} placeholder={n === "mobile" ? "98765 43210" : undefined} className="w-full border-b border-[#CBD5E1] bg-[#F7F9FC] px-3 py-3 text-sm outline-none focus:border-[#F9B900]" /></label>)}<label><span className="mb-1 block text-[10px] font-bold uppercase tracking-[.14em] text-[#64748B]">Preferred Car</span><select required value={quote.car} onChange={e => setQuote(x => ({ ...x, car: e.target.value }))} className="w-full border-b border-[#CBD5E1] bg-[#F7F9FC] px-3 py-3 text-sm outline-none focus:border-[#F9B900]"><option value="">Select a car</option>{cars.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label><div className="grid gap-2 sm:grid-cols-2"><button name="submissionChannel" value="website" disabled={isSubmitting} className="flex items-center justify-center bg-[#071D49] px-4 py-3.5 text-sm font-bold text-white transition hover:bg-[#F9B900] hover:text-[#071D49] disabled:cursor-wait disabled:opacity-70">{isSubmitting ? <><Loader2 className="mr-2 animate-spin" size={16} />Sending...</> : <>Send via Website <ArrowRight className="ml-1" size={16} /></>}</button><button name="submissionChannel" value="whatsapp" disabled={isSubmitting} className="flex items-center justify-center bg-[#25D366] px-4 py-3.5 text-sm font-bold text-[#073B20] transition hover:bg-[#1fbd5a] disabled:cursor-wait disabled:opacity-70">{isSubmitting ? <><Loader2 className="mr-2 animate-spin" size={16} />Sending...</> : <><MessageCircle className="mr-1" size={16} />Send on WhatsApp</>}</button></div>{quoteError && <p role="alert" className="md:col-span-3 text-sm font-semibold text-[#B42318]">{quoteError}</p>}</form>}</div>
+                </div>
+                <div className="relative mt-22 grid border-t border-white/10 bg-[#051533] text-white sm:grid-cols-5">
+                </div>
+                </section>
+            <section id="cars" className="bg-white py-24"><div className="mx-auto max-w-[1320px] px-5 lg:px-8"><div className="text-center"><p className="text-[11px] font-bold tracking-[.2em] text-[#9a7100]">OUR FLEET</p><h2 className="mt-4 text-4xl font-extrabold sm:text-5xl">Choose your kind of comfort.</h2><p className="mx-auto mt-3 max-w-xl text-sm text-[#64748B]">Live listings from our marketplace, updated from the database.</p></div>{fleetError ? <p className="mt-12 text-center text-sm text-[#B42318]">Unable to load cars right now. Please try again shortly.</p> : fleetLoading ? <p className="mt-12 text-center text-sm text-[#64748B]">Loading available cars...</p> : cars.length === 0 ? <p className="mt-12 text-center text-sm text-[#64748B]">No cars are listed yet.</p> : <div className="fleet-scroll mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">{cars.map(c => <FleetCard key={c.id || c.name} car={c} onViewDetails={setCar} onBook={setCar} />)}</div>}</div></section>
             <QuickTravelSections />
             <GallerySection />
+            <OfficeLocationSection />
+            <GoogleReviewsSection />
 
           <section
   id="reviews"
-  className="relative mx-auto max-w-[1320px] px-5 py-24 lg:px-8"
+  className="hidden"
 >
   {/* Header */}
   <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
@@ -252,7 +284,7 @@ export default function App() {
 
       <a
         className="mt-2 inline-block text-sm text-white/60 hover:text-[#F9B900]"
-        href={"https://wa.me/" + PHONE.slice(1)}
+        href={"https://wa.me/" + WHATSAPP_PHONE}
       >
         WhatsApp us
       </a>
@@ -275,6 +307,7 @@ export default function App() {
       >
         Book Your Ride
       </a>
+      <div className="mt-6"><SocialLinks /></div>
     </div>
 
   </div>
@@ -320,10 +353,6 @@ export default function App() {
             <span className="ml-1 text-[#64748B]">rating</span>
           </div>
 
-          <p className="mt-2 text-xl font-extrabold text-[#071D49] sm:mt-3 sm:text-2xl">
-            {car.rate}
-          </p>
-
           {/* Features */}
           <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-[#64748B] sm:mt-5 sm:gap-3 sm:text-sm">
             {[
@@ -366,7 +395,7 @@ export default function App() {
             </a>
 
             <a
-              href={"https://wa.me/" + PHONE.slice(1)}
+              href={"https://wa.me/" + WHATSAPP_PHONE}
               className="col-span-2 rounded-lg border border-[#071D49] px-3 py-2.5 text-center text-xs font-bold text-[#071D49] sm:w-auto sm:text-sm"
             >
               WhatsApp

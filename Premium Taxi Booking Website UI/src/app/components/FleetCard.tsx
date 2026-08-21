@@ -1,12 +1,13 @@
 import { Star, Users } from "lucide-react";
 
 export type FleetCar = {
+  id?: string;
   name: string;
   type: string;
   seats: string;
-  rate: string;
   tag: string;
   img: string;
+  status?: "available" | "sold" | "inactive";
 };
 
 function Stars() {
@@ -34,7 +35,7 @@ export function FleetCard({ car, onViewDetails, onBook }: FleetCardProps) {
       {/* Image canvas */}
       <div className="relative flex aspect-[16/10] items-center justify-center bg-[#F7F7F7] p-4 sm:p-5">
         <span className="absolute left-3 top-3 z-10 rounded bg-[#FFC928] px-3 py-1 text-[10px] font-extrabold tracking-[.14em] text-[#171717]">
-          {car.tag}
+          {car.status === "available" ? car.tag : car.status === "sold" ? "Sold" : "Unavailable"}
         </span>
         <img
           src={car.img}
@@ -61,7 +62,6 @@ export function FleetCard({ car, onViewDetails, onBook }: FleetCardProps) {
             <Users className="text-[#F9B900]" size={15} />
             {car.seats}
           </span>
-          <b className="text-base text-[#071D49]">{car.rate}</b>
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-3">
@@ -75,9 +75,10 @@ export function FleetCard({ car, onViewDetails, onBook }: FleetCardProps) {
           <button
             type="button"
             onClick={() => onBook(car)}
-            className="rounded-lg bg-[#FFC928] py-2.5 text-xs font-bold text-[#171717] transition-colors duration-200 hover:bg-[#e6ad00]"
+            disabled={car.status !== "available"}
+            className="rounded-lg bg-[#FFC928] py-2.5 text-xs font-bold text-[#171717] transition-colors duration-200 hover:bg-[#e6ad00] disabled:cursor-not-allowed disabled:bg-[#E2E8F0] disabled:text-[#94A3B8]"
           >
-            Book Now
+            {car.status === "available" ? "Book Now" : "Unavailable"}
           </button>
         </div>
       </div>
