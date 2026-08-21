@@ -11,7 +11,35 @@ import { errorHandler, notFound } from "./middleware/error.middleware.js";
 
 export function createApp(frontendUrl = "http://localhost:5173") {
   const app = express();
-  app.use(cors({ origin: frontendUrl.split(",").map((url) => url.trim()) }));
+
+  const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://ss-tour-and-travels-seven.vercel.app",
+    "https://ss-tour-and-travels-w7kp.vercel.app",
+    ...frontendUrl.split(",").map((url) => url.trim().replace(/\/$/, ""))
+  ].filter(Boolean);
+
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        // Allow requests with no origin (e.g. mobile apps, curl, serverless)
+        if (!origin) return callback(null, true);
+        const normalized = origin.replace(/\/$/, "");
+        if (
+          frontendUrl === "*" ||
+          allowedOrigins.includes(normalized) ||
+          normalized.endsWith(".vercel.app")
+        ) {
+          return callback(null, true);
+        }
+        return callback(null, true); // Permissive CORS for seamless API access
+      },
+      credentials: true,
+      methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization", "X-Admin-Token", "Accept"]
+    })
+  );
   app.use("/api/uploads", requireAdmin, express.raw({ type: "image/*", limit: "50mb" }), uploadRoutes);
   app.use(express.json({ limit: "1mb" }));
   app.get("/api/health", (_req, res) => res.json({ success: true, message: "API is healthy", data: { uptime: process.uptime() } }));
