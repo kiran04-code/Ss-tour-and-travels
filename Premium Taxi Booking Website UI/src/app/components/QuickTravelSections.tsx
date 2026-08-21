@@ -388,7 +388,7 @@ export function QuickTravelSections() {
                       <Phone size={12} className="text-[#9a7100]" /> Mobile / WhatsApp <span className="text-[#B42318]">*</span>
                     </span>
                     <div className="relative mt-1 flex rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] overflow-hidden focus-within:border-[#F9B900] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#F9B900]/20">
-                      <span className="flex items-center bg-[#E2E8F0]/75 px-2.5 text-xs font-bold text-[#071D49] border-r border-[#CBD5E1] select-none">
+                      <span className="flex items-center bg-[#E2E8F0] px-3 text-xs font-extrabold text-[#071D49] border-r border-[#CBD5E1] select-none">
                         +91
                       </span>
                       <input
@@ -404,8 +404,8 @@ export function QuickTravelSections() {
                           if (val.startsWith("0")) val = val.slice(1);
                           setForm({ ...form, phone: val.slice(0, 10) });
                         }}
-                        placeholder="98765 43210"
-                        className="w-full bg-transparent px-3 py-2 text-xs font-semibold text-[#071D49] outline-none"
+                        placeholder="80103 74300"
+                        className="w-full bg-transparent px-3 py-2 text-xs font-semibold text-[#071D49] outline-none placeholder:text-[#94A3B8]"
                       />
                     </div>
                   </label>

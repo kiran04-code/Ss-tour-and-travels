@@ -19,13 +19,13 @@ export function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
       </div>
 
-      <div className="relative mx-auto flex min-h-[480px] max-w-[1240px] flex-col justify-center px-4 py-8 sm:min-h-[520px] sm:px-8 sm:py-12 lg:min-h-[560px] lg:grid lg:grid-cols-[.95fr_1.05fr] lg:items-center lg:py-16">
-        <div className="relative z-10 max-w-xl">
-          <p className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[.2em] text-[#9a7100] sm:text-xs">
+      <div className="relative mx-auto flex min-h-[460px] max-w-[1240px] flex-col justify-start px-4 pt-7 pb-8 sm:min-h-[500px] sm:px-8 sm:pt-8 sm:pb-12 lg:min-h-[540px] lg:grid lg:grid-cols-[.95fr_1.05fr] lg:items-center lg:py-14">
+        <div className="relative z-10 max-w-xl mt-1 sm:mt-0">
+          <p className="mb-2.5 sm:mb-3 flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[.2em] text-[#9a7100] sm:text-xs">
             <span className="h-0.5 w-6 bg-[#FFC928]" />
             Trusted Taxi Service in Solapur
           </p>
-          <h1 className="mt-2.5 text-5xl font-extrabold leading-[1.08] tracking-tight xs:text-4xl sm:text-6xl sm:leading-[1.0] lg:text-7xl lg:leading-[.94]">
+          <h1 className="mt-1 text-5xl font-extrabold leading-[1.08] tracking-tight xs:text-4xl sm:text-6xl sm:leading-[1.0] lg:text-7xl lg:leading-[.94]">
             Taxi service<br />in <span className="text-[#e6ad00]">Solapur.</span>
           </h1>
           <p className="mt-3 max-w-md text-sm font-medium leading-relaxed text-[#444] sm:mt-5 sm:text-base sm:text-[#555]">
