@@ -9,16 +9,20 @@ import { businessRoutes } from "./routes/business.routes.js";
 import { requireAdmin } from "./middleware/admin.middleware.js";
 import { errorHandler, notFound } from "./middleware/error.middleware.js";
 
-export function createApp(frontendUrl = "http://localhost:5173") {
+export function createApp(frontendUrl: string) {
   const app = express();
+
+  const dynamicOrigins = typeof frontendUrl === "string"
+    ? frontendUrl.split(",").map((url: string) => url.trim().replace(/\/$/, "")).filter(Boolean)
+    : [];
 
   const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:3000",
     "https://ss-tour-and-travels-seven.vercel.app",
     "https://ss-tour-and-travels-w7kp.vercel.app",
-    ...frontendUrl.split(",").map((url) => url.trim().replace(/\/$/, ""))
-  ].filter(Boolean);
+    ...dynamicOrigins
+  ];
 
   app.use(
     cors({
