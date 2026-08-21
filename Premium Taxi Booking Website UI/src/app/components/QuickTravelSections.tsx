@@ -10,7 +10,7 @@ const benefits = [
   [ShieldCheck, "Safe & Comfortable"],
 ] as const;
 
-const routes = ["Solapur to Akkalkot", "Solapur to Tuljapur", "Solapur to Pandharpur", "Solapur to Ganagapur", "Solapur to Pune", "Solapur to Mumbai", "Solapur Airport Taxi"];
+const routes = ["Solapur to Akkalkot", "Solapur to Tuljapur", "Solapur to Pandharpur", "Solapur to Ganagapur", "Solapur to Pune", "Solapur to Mumbai", ];
 
 function SectionTitle({ children }: { children: ReactNode }) {
   return <div className="text-center"><h2 className="text-xl font-extrabold text-[#171717] sm:text-2xl">{children}</h2><span className="mx-auto mt-2 block h-0.5 w-7 bg-[#FFC928]" /></div>;
