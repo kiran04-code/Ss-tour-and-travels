@@ -16,6 +16,7 @@ export const errorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
     return sendError(res, "Validation failed", details, 422);
   }
   if (error instanceof mongoose.Error.CastError) return sendError(res, "Invalid resource id", undefined, 400);
-  console.error(error);
-  return sendError(res, "Internal server error", undefined, 500);
+  console.error("[Unhandled Error]:", error);
+  const message = error instanceof Error ? error.message : "Internal server error";
+  return sendError(res, message, undefined, 500);
 };

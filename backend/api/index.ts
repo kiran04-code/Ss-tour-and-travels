@@ -3,19 +3,19 @@ import type { Request, Response } from "express";
 import { connectDatabase } from "../src/config/db.js";
 import { createApp } from "../src/app.js";
 
-let isDbConnected = false;
-
 const app = createApp(process.env.FRONTEND_URL || "*");
 
 export default async function handler(req: Request, res: Response) {
-  if (!isDbConnected) {
-    const mongoUri = process.env.MONGODB_URI || "mongodb://localhost:27017/car-platform";
+  const mongoUri = process.env.MONGODB_URI;
+  if (!mongoUri) {
+    console.error("[Vercel Handler] Error: MONGODB_URI environment variable is not defined in Vercel settings!");
+  } else {
     try {
       await connectDatabase(mongoUri);
-      isDbConnected = true;
     } catch (err) {
-      console.error("Database connection failed on serverless handler:", err);
+      console.error("[Vercel Handler] Database connection error:", (err as Error).message);
     }
   }
   return app(req, res);
 }
+
