@@ -11,11 +11,25 @@ export interface QuoteNotificationPayload {
   createdAt?: Date;
 }
 
+function getCleanAdminUrl(): string {
+  if (process.env.WEBSITE_URL) {
+    return `${process.env.WEBSITE_URL.trim().replace(/\/$/, "")}/admin`;
+  }
+  const raw = process.env.FRONTEND_URL || "https://www.sstour.in";
+  const origins = raw.split(",").map((s) => s.trim().replace(/\/$/, "")).filter(Boolean);
+  // Prioritize production domain www.sstour.in or vercel deployment, else fallback to first origin
+  const prod = origins.find((s) => s.includes("sstour.in")) 
+    || origins.find((s) => s.includes("vercel.app")) 
+    || origins.find((s) => s.startsWith("https://")) 
+    || origins[0] 
+    || "https://www.sstour.in";
+  return `${prod}/admin`;
+}
+
 export const emailService = {
   async sendNewQuoteNotification(payload: QuoteNotificationPayload): Promise<void> {
     const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || "kiran.rathod.dev1@gmail.com";
-    const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
-    const adminUrl = `${frontendUrl}/admin`;
+    const adminUrl = getCleanAdminUrl();
     const cleanPhone = payload.customerPhone.replace(/\D/g, "");
     const emailDisplay = payload.customerEmail
       ? `<a href="mailto:${payload.customerEmail}" style="color: #071D49;">${payload.customerEmail}</a>`
