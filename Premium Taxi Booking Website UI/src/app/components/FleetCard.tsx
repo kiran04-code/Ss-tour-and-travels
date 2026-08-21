@@ -7,6 +7,11 @@ export type FleetCar = {
   seats: string;
   tag: string;
   img: string;
+  images?: string[];
+  description?: string;
+  fuelType?: string;
+  transmission?: string;
+  location?: string;
   status?: "available" | "sold" | "inactive";
 };
 

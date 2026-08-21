@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, Car, Check, Clock3, Headphones, Loader2, MapPin, Menu, MessageCircle, Navigation, Phone, ShieldCheck, Sparkles, Star, Users, Wind, X } from "lucide-react";
+import { ArrowRight, Camera, Car, Check, ChevronLeft, ChevronRight, Clock3, Headphones, Loader2, MapPin, Menu, MessageCircle, Navigation, Phone, ShieldCheck, Sparkles, Star, Users, Wind, X } from "lucide-react";
 import logo from "../public/logo1.png";
 import image1 from "../public/image1.png";
 import image2 from "../public/image2.jpg";
@@ -8,6 +8,7 @@ import { DestinationsSection } from "./components/DestinationsSection";
 import { FleetCard, type FleetCar } from "./components/FleetCard";
 import { HeroSection } from "./components/HeroSection";
 import { GallerySection } from "./components/GallerySection";
+import { FAQSection } from "./components/FAQSection";
 import { GoogleReviewsSection, OfficeLocationSection } from "./components/BusinessSections";
 import { SocialLinks } from "./components/SocialLinks";
 import { QuickTravelSections } from "./components/QuickTravelSections";
@@ -18,7 +19,21 @@ import type { Car as DatabaseCar } from "../api/types";
 const PHONE = "+918010374300";
 const WHATSAPP_PHONE = "918010374300";
 function toFleetCar(car: DatabaseCar): FleetCar {
-  return { id: car._id, name: car.name, type: `${car.brand} · ${car.model}`, seats: `${car.fuelType} · ${car.transmission}`, tag: "DB Listing", img: car.images[0] || "", status: car.status };
+  const images = (car.images && car.images.length > 0) ? car.images : (car.img ? [car.img] : []);
+  return {
+    id: car._id,
+    name: car.name,
+    type: `${car.brand} · ${car.model}`,
+    seats: `${car.fuelType} · ${car.transmission}`,
+    tag: "DB Listing",
+    img: images[0] || "",
+    images: images,
+    description: car.description,
+    fuelType: car.fuelType,
+    transmission: car.transmission,
+    location: car.location,
+    status: car.status
+  };
 }
 const reviews = [
   [
@@ -53,6 +68,8 @@ function Logo() { return <a href="#home" className="flex h-10 sm:h-12 lg:h-16 it
 function Stars() { return <span className="inline-flex gap-0.5 text-[#F9B900]">{[1, 2, 3, 4, 5].map(i => <Star key={i} size={13} fill="currentColor" />)}</span> }
 export default function App() {
     const [menu, setMenu] = useState(false), [scrolled, setScrolled] = useState(false), [car, setCar] = useState<FleetCar | null>(null), [review, setReview] = useState(false), [sent, setSent] = useState(false);
+    const [activeCarImg, setActiveCarImg] = useState(0);
+    const [carTouchStart, setCarTouchStart] = useState(0);
     const [cars, setCars] = useState<FleetCar[]>([]), [fleetLoading, setFleetLoading] = useState(true), [fleetError, setFleetError] = useState("");
     const [quote, setQuote] = useState({ name: "", mobile: "", email: "", pickup: "", drop: "", date: "", car: "" });
     const [isSubmitting, setIsSubmitting] = useState(false), [confirmedQuote, setConfirmedQuote] = useState<typeof quote | null>(null), [quoteError, setQuoteError] = useState("");
@@ -94,7 +111,7 @@ export default function App() {
         }
     };
     useEffect(() => { const onScroll = () => setScrolled(window.scrollY > 20); onScroll(); window.addEventListener("scroll", onScroll, { passive: true }); return () => window.removeEventListener("scroll", onScroll) }, []);
-    const links = [["Home", "#home"], ["About Us", "#experience"], ["Our Cars", "#cars"], ["Outstation", "#book"], ["Airport Transfer", "#book"], ["Solapur Local", "#book"], ["Contact", "#contact"]];
+    const links = [["Home", "#home"], ["Our Cars", "#cars"], ["Gallery", "#gallery"], ["Reviews", "#reviews"], ["FAQ", "#faq"], ["Contact", "#contact"]];
     return <div className="min-h-screen overflow-x-hidden bg-[#F7F9FC] text-[#071D49]">
         <header style={{ fontFamily: "Teachers, sans-serif" }} className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${scrolled ? "border-white/10 bg-[#071D49]/98 shadow-[0_8px_28px_rgba(0,0,0,.22)]" : "border-white/10 bg-[#071D49]/35 backdrop-blur-md"}`}><div className="mx-auto flex h-[64px] sm:h-[72px] lg:h-[78px] max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-8"><Logo /><nav className="hidden h-full items-center gap-5 xl:flex">{links.map(([l, h], index) => <a key={l} href={h} className={`group relative flex h-full items-center text-[12px] font-semibold tracking-[.02em] transition-colors duration-200 hover:text-[#F9B900] ${index === 0 ? "text-[#F9B900]" : "text-white/80"}`}><span>{l}</span><span className={`absolute bottom-0 left-0 h-0.5 bg-[#F9B900] transition-all duration-300 ${index === 0 ? "w-full" : "w-0 group-hover:w-full"}`} /></a>)}</nav><div className="hidden items-center gap-3 xl:flex"><a href={"tel:" + PHONE} className="flex items-center gap-2 border-r border-white/20 pr-4 text-sm font-bold text-white transition-colors hover:text-[#F9B900]"><Phone size={15} className="text-[#F9B900]" /><span className="text-[#F9B900]">Call Now</span><span className="text-white">+91 80103 74300</span></a><a aria-label="Chat on WhatsApp" href={"https://wa.me/" + WHATSAPP_PHONE} className="grid h-9 w-9 place-items-center border border-white/30 text-white transition-colors hover:border-[#F9B900] hover:bg-[#F9B900] hover:text-[#071D49]"><MessageCircle size={17} /></a></div><div className="flex items-center gap-2 sm:gap-3 xl:hidden"><a href={"tel:" + PHONE} aria-label="Call now" className="grid h-8 w-8 sm:h-9 sm:w-9 place-items-center rounded-md border border-[#F9B900]/70 text-[#F9B900] transition hover:bg-[#F9B900] hover:text-[#071D49]"><Phone size={15} /></a><button aria-label={menu ? "Close menu" : "Open menu"} className="grid h-8 w-8 sm:h-9 sm:w-9 place-items-center rounded-md border border-white/30 text-white transition-colors hover:border-[#F9B900] hover:text-[#F9B900]" onClick={() => setMenu(!menu)}>{menu ? <X size={18} /> : <Menu size={18} />}</button></div></div>{menu && <nav className="border-t border-white/10 bg-[#071D49] px-4 pb-5 pt-2 shadow-2xl xl:hidden sm:px-6">{links.map(([l, h], index) => <a onClick={() => setMenu(false)} key={l} href={h} className={`flex items-center justify-between border-b border-white/10 py-3 text-sm font-semibold transition hover:text-[#F9B900] ${index === 0 ? "text-[#F9B900]" : "text-white/85"}`}><span>{l}</span><ArrowRight size={14} className="text-[#F9B900]" /></a>)}<a onClick={() => setMenu(false)} href="#book" className="mt-4 block rounded-lg bg-[#FFC928] px-4 py-3 text-center text-sm font-extrabold text-[#071D49] transition hover:bg-[#e6ad00]">Book Your Taxi <ArrowRight className="ml-1 inline" size={15} /></a></nav>}</header>
         <main>
@@ -108,8 +125,8 @@ export default function App() {
             <section id="cars" className="bg-white py-24"><div className="mx-auto max-w-[1320px] px-5 lg:px-8"><div className="text-center"><p className="text-[11px] font-bold tracking-[.2em] text-[#9a7100]">OUR FLEET</p><h2 className="mt-4 text-4xl font-extrabold sm:text-5xl">Choose your kind of comfort.</h2><p className="mx-auto mt-3 max-w-xl text-sm text-[#64748B]">Live listings from our marketplace, updated from the database.</p></div>{fleetError ? <p className="mt-12 text-center text-sm text-[#B42318]">Unable to load cars right now. Please try again shortly.</p> : fleetLoading ? <p className="mt-12 text-center text-sm text-[#64748B]">Loading available cars...</p> : cars.length === 0 ? <p className="mt-12 text-center text-sm text-[#64748B]">No cars are listed yet.</p> : <div className="fleet-scroll mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">{cars.map(c => <FleetCard key={c.id || c.name} car={c} onViewDetails={setCar} onBook={setCar} />)}</div>}</div></section>
             <QuickTravelSections />
             <GallerySection />
-            {/* <OfficeLocationSection /> */}
             <GoogleReviewsSection />
+            <FAQSection />
           <section
   id="reviews"
   className="hidden"
@@ -295,10 +312,13 @@ export default function App() {
     <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
       <div>
         <Logo />
-        <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/55">
-          Comfortable, reliable and affordable rides for local and outstation
+        <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/60">
+          Comfortable, reliable and affordable rides for local, temple tours and outstation
           travel across Maharashtra.
         </p>
+        <div className="mt-5">
+          <SocialLinks />
+        </div>
       </div>
 
       <div>
@@ -306,10 +326,10 @@ export default function App() {
           OUR SERVICES
         </p>
         <div className="mt-3 grid gap-2 text-sm text-white/60">
-          <span>City Rides</span>
-          <span>Outstation Rides</span>
-          <span>Airport Pickup & Drop</span>
-          <span>Tour &amp; Travel</span>
+          <span>City Taxi Rides</span>
+          <span>Outstation Cabs</span>
+          <span>Airport Pickup &amp; Drop</span>
+          <span>Pandharpur &amp; Akkalkot Darshan</span>
         </div>
       </div>
 
@@ -319,144 +339,233 @@ export default function App() {
         </p>
 
         <a
-          className="mt-3 block text-lg font-extrabold text-white"
+          className="mt-3 block text-lg font-extrabold text-white hover:text-[#F9B900]"
           href={"tel:" + PHONE}
         >
           +91 80103 74300
         </a>
 
+        <p className="mt-1 text-xs text-white/50">
+          Owner: Siddhant Sakhare
+        </p>
+
         <a
-          className="mt-2 inline-block text-sm text-white/60 hover:text-[#F9B900]"
+          className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#26734D] px-3.5 py-2 text-xs font-bold text-white transition hover:bg-[#1f5c3e]"
           href={"https://wa.me/" + WHATSAPP_PHONE}
+          target="_blank"
+          rel="noreferrer"
         >
-          WhatsApp us
+          <MessageCircle size={14} /> WhatsApp Chat
         </a>
       </div>
 
       <div>
         <p className="text-xs font-bold tracking-[.16em] text-[#F9B900]">
-          TRAVEL WITH US
+          OFFICE LOCATION
         </p>
 
-        <p className="mt-3 text-sm leading-relaxed text-white/60">
-          Available 24/7 for your travel needs.
+        <p className="mt-3 text-xs leading-relaxed text-white/60">
+          Shop no - 4, Railway Lines Rd,
           <br />
-          Solapur, Maharashtra
+          Railway lines, Solapur,
+          <br />
+          Maharashtra 413001
         </p>
 
         <a
           href="#book"
-          className="mt-4 inline-block border border-white/30 px-4 py-2 text-xs font-bold transition hover:border-[#F9B900] hover:text-[#F9B900]"
+          className="mt-4 inline-block rounded-lg bg-[#F9B900] px-4 py-2 text-xs font-extrabold text-[#071D49] shadow-sm transition hover:bg-[#e6ad00]"
         >
           Book Your Ride
         </a>
-        <div className="mt-6"><SocialLinks /></div>
       </div>
     </div>
 
-    <div className="mt-8 border-t border-white/10 pt-4 text-xs text-white/40">
-      © 2026 SS Tours &amp; Travels. All rights reserved.
+    <div className="mt-10 border-t border-white/10 pt-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/40">
+      <span>© 2026 SS Tours &amp; Travels (Siddhant Sakhare). All rights reserved.</span>
+      <span>Shop no - 4, Railway Lines Rd, Solapur, Maharashtra 413001</span>
     </div>
   </div>
 </footer>    
-{car && (
-  <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#071D49]/75 p-3 sm:p-6">
-    <div className="relative max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-xl bg-white shadow-2xl sm:rounded-2xl">
+{car && (() => {
+  const carImages = (car.images && car.images.length > 0) ? car.images : (car.img ? [car.img] : []);
+  const currentImg = carImages[activeCarImg] || carImages[0] || car.img || "";
+  const nextCarImg = () => setActiveCarImg((prev) => (prev + 1) % carImages.length);
+  const prevCarImg = () => setActiveCarImg((prev) => (prev - 1 + carImages.length) % carImages.length);
 
-      <button
-        onClick={() => setCar(null)}
-        className="absolute right-2 top-2 z-10 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-[#071D49] shadow sm:right-4 sm:top-4"
-      >
-        <X size={18} />
-      </button>
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#071D49]/75 p-3 sm:p-6 backdrop-blur-sm">
+      <div className="relative max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-xl bg-white shadow-2xl sm:rounded-2xl">
 
-      <div className="grid md:grid-cols-2">
+        <button
+          onClick={() => { setCar(null); setActiveCarImg(0); }}
+          className="absolute right-2 top-2 z-20 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-[#071D49] shadow-md transition hover:bg-[#071D49] hover:text-white sm:right-4 sm:top-4"
+          aria-label="Close car details modal"
+        >
+          <X size={18} />
+        </button>
 
-        {/* Image */}
-        <img
-          src={car.img}
-          alt={car.name}
-          className="h-40 w-full object-cover sm:h-56 md:h-full md:min-h-[500px]"
-        />
+        <div className="grid md:grid-cols-2">
 
-        {/* Content */}
-        <div className="p-4 sm:p-7">
+          {/* Left Column: Swipeable Image Gallery */}
+          <div className="flex flex-col bg-[#F8FAFC]">
+            <div
+              className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden bg-[#E2E8F0] md:h-full md:min-h-[460px]"
+              onTouchStart={(e) => setCarTouchStart(e.changedTouches[0].clientX)}
+              onTouchEnd={(e) => {
+                const diff = e.changedTouches[0].clientX - carTouchStart;
+                if (Math.abs(diff) > 40 && carImages.length > 1) {
+                  if (diff < 0) nextCarImg();
+                  else prevCarImg();
+                }
+              }}
+            >
+              <img
+                key={currentImg}
+                src={currentImg}
+                alt={`${car.name} photo ${activeCarImg + 1}`}
+                className="h-full w-full object-cover transition-all duration-300"
+              />
 
-          <p className="text-[9px] font-bold uppercase tracking-[.16em] text-[#9a7100] sm:text-xs">
-            {car.tag} · {car.type}
-          </p>
+              {/* Photo Count Badge */}
+              {carImages.length > 1 && (
+                <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-[#071D49]/80 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm">
+                  <Camera size={13} className="text-[#F9B900]" />
+                  <span>{activeCarImg + 1} / {carImages.length}</span>
+                </div>
+              )}
 
-          <h2 className="mt-1 text-2xl font-extrabold text-[#071D49] sm:mt-2 sm:text-3xl">
-            {car.name}
-          </h2>
+              {/* Left / Right Arrow Controls */}
+              {carImages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); prevCarImg(); }}
+                    aria-label="Previous car photo"
+                    className="absolute left-2.5 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-[#071D49] shadow-md transition hover:bg-[#F9B900] active:scale-95"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
 
-          <div className="mt-2 flex items-center text-sm">
-            <Stars />
-            <b className="ml-2">4.9</b>
-            <span className="ml-1 text-[#64748B]">rating</span>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); nextCarImg(); }}
+                    aria-label="Next car photo"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-[#071D49] shadow-md transition hover:bg-[#F9B900] active:scale-95"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </>
+              )}
+
+              {/* Swipe Hint on Mobile */}
+              {carImages.length > 1 && (
+                <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-0.5 text-[10px] font-semibold text-white/90 md:hidden">
+                  Swipe for more photos
+                </div>
+              )}
+            </div>
+
+            {/* Thumbnail Strip */}
+            {carImages.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto border-t border-[#E2E8F0] bg-white p-2.5">
+                {carImages.map((img, idx) => (
+                  <button
+                    key={`${img}-${idx}`}
+                    type="button"
+                    onClick={() => setActiveCarImg(idx)}
+                    className={`shrink-0 overflow-hidden rounded-md border-2 transition-all ${
+                      idx === activeCarImg
+                        ? "border-[#F9B900] ring-2 ring-[#F9B900]/30 scale-105"
+                        : "border-transparent opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="h-12 w-16 object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Features */}
-          <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-[#64748B] sm:mt-5 sm:gap-3 sm:text-sm">
-            {[
-              car.seats,
-              "Air Conditioned",
-              "2 large bags",
-              "Music system",
-              "Verified driver",
-              "Safety checked",
-            ].map(x => (
-              <span
-                key={x}
-                className="rounded-md bg-[#F8FAFC] px-2 py-2 sm:border-l-2 sm:border-[#F9B900] sm:bg-transparent sm:pl-2"
+          {/* Right Column: Car Details & Actions */}
+          <div className="p-4 sm:p-7">
+            <p className="text-[9px] font-bold uppercase tracking-[.16em] text-[#9a7100] sm:text-xs">
+              {car.tag} · {car.type}
+            </p>
+
+            <h2 className="mt-1 text-2xl font-extrabold text-[#071D49] sm:mt-2 sm:text-3xl">
+              {car.name}
+            </h2>
+
+            <div className="mt-2 flex items-center text-sm">
+              <Stars />
+              <b className="ml-2">4.9</b>
+              <span className="ml-1 text-[#64748B]">rating</span>
+            </div>
+
+            {/* Features */}
+            <div className="mt-4 grid grid-cols-2 gap-2 text-xs text-[#64748B] sm:mt-5 sm:gap-3 sm:text-sm">
+              {[
+                car.seats,
+                "Air Conditioned",
+                "2 large bags",
+                "Music system",
+                "Verified driver",
+                "Safety checked",
+              ].map(x => (
+                <span
+                  key={x}
+                  className="rounded-md bg-[#F8FAFC] px-2 py-2 sm:border-l-2 sm:border-[#F9B900] sm:bg-transparent sm:pl-2"
+                >
+                  {x}
+                </span>
+              ))}
+            </div>
+
+            <p className="mt-4 text-xs leading-relaxed text-[#64748B] sm:mt-5 sm:text-sm">
+              {car.description || "Comfortable seating, responsible driving and a local professional who knows the route."}
+            </p>
+
+            {/* Action Buttons */}
+            <div className="mt-5 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+              <a
+                href="#book"
+                onClick={() => { setCar(null); setActiveCarImg(0); }}
+                className="rounded-lg bg-[#F9B900] px-3 py-2.5 text-center text-xs font-bold text-[#071D49] shadow-sm transition hover:bg-[#e6ad00] sm:px-4 sm:py-3 sm:text-sm"
               >
-                {x}
-              </span>
-            ))}
+                Book This Car
+              </a>
+
+              <a
+                href={"tel:" + PHONE}
+                className="rounded-lg bg-[#071D49] px-3 py-2.5 text-center text-xs font-bold text-white shadow-sm transition hover:bg-[#12367d] sm:px-4 sm:py-3 sm:text-sm"
+              >
+                Call Now
+              </a>
+
+              <a
+                href={"https://wa.me/" + WHATSAPP_PHONE}
+                target="_blank"
+                rel="noreferrer"
+                className="col-span-2 rounded-lg border border-[#071D49] px-3 py-2.5 text-center text-xs font-bold text-[#071D49] transition hover:bg-[#071D49] hover:text-white sm:w-auto sm:text-sm"
+              >
+                WhatsApp
+              </a>
+            </div>
+
+            <p className="mt-4 border-t border-[#F1F5F9] pt-3 text-[10px] leading-relaxed text-[#64748B] sm:mt-6 sm:pt-4 sm:text-xs">
+              Vehicle feedback: <b>“Smooth, comfortable and on time.”</b>
+            </p>
           </div>
-
-          <p className="mt-4 text-xs leading-relaxed text-[#64748B] sm:mt-5 sm:text-sm">
-            Comfortable seating, responsible driving and a local professional
-            who knows the route.
-          </p>
-
-          {/* Buttons */}
-          <div className="mt-5 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-            <a
-              href="#book"
-              onClick={() => setCar(null)}
-              className="rounded-lg bg-[#F9B900] px-3 py-2.5 text-center text-xs font-bold text-[#071D49] sm:px-4 sm:py-3 sm:text-sm"
-            >
-              Book This Car
-            </a>
-
-            <a
-              href={"tel:" + PHONE}
-              className="rounded-lg bg-[#071D49] px-3 py-2.5 text-center text-xs font-bold text-white sm:px-4 sm:py-3 sm:text-sm"
-            >
-              Call Now
-            </a>
-
-            <a
-              href={"https://wa.me/" + WHATSAPP_PHONE}
-              className="col-span-2 rounded-lg border border-[#071D49] px-3 py-2.5 text-center text-xs font-bold text-[#071D49] sm:w-auto sm:text-sm"
-            >
-              WhatsApp
-            </a>
-          </div>
-
-          <p className="mt-4 border-t pt-3 text-[10px] leading-relaxed text-[#64748B] sm:mt-6 sm:pt-4 sm:text-xs">
-            Vehicle feedback:{" "}
-            <b>
-              “Smooth, comfortable and on time.”
-            </b>
-          </p>
-
         </div>
       </div>
     </div>
-  </div>
-)}    
+  );
+})()}    
         {review && <div className="fixed inset-0 z-[70] grid place-items-center bg-[#071D49]/75 p-4"><div className="w-full max-w-md bg-white p-7 shadow-2xl"><button onClick={() => setReview(false)} className="float-right"><X /></button>{sent ? <div className="py-10 text-center"><span className="inline-grid h-14 w-14 place-items-center rounded-full bg-[#F9B900]"><Check /></span><h2 className="mt-5 text-2xl font-extrabold">Thank you for sharing.</h2><p className="mt-2 text-sm text-[#64748B]">Your review has been received.</p><button onClick={() => setReview(false)} className="mt-6 bg-[#071D49] px-5 py-3 text-sm font-bold text-white">Close</button></div> : <form onSubmit={e => { e.preventDefault(); setSent(true) }}><p className="text-xs font-bold tracking-[.18em] text-[#9a7100]">YOUR EXPERIENCE</p><h2 className="mt-2 text-2xl font-extrabold">Write a Review</h2><label className="mt-5 block text-xs font-bold">Name<input required className="mt-2 w-full border-b p-3 outline-none focus:border-[#F9B900]" /></label><div className="mt-5"><p className="text-xs font-bold">Star Rating</p><div className="mt-2"><Stars /></div></div><label className="mt-5 block text-xs font-bold">Your Experience<textarea required className="mt-2 h-24 w-full border p-3 text-sm outline-none focus:border-[#F9B900]" /></label><button className="mt-5 w-full bg-[#071D49] py-3 text-sm font-bold text-white">Submit Review</button></form>}</div></div>}
         <div className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-2 lg:hidden"><a href={"tel:" + PHONE} className="bg-[#F9B900] py-3 text-center text-xs font-extrabold">Call Now</a><a href="#book" className="bg-[#071D49] py-3 text-center text-xs font-extrabold text-white">Book a Ride</a></div></div>
 }
