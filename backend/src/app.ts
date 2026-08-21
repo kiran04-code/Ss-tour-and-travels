@@ -8,6 +8,7 @@ import { quoteRoutes } from "./routes/quote.routes.js";
 import { uploadRoutes } from "./routes/upload.routes.js";
 import { galleryRoutes } from "./routes/gallery.routes.js";
 import { businessRoutes } from "./routes/business.routes.js";
+import { seoRoutes } from "./routes/seo.routes.js";
 import { requireAdmin } from "./middleware/admin.middleware.js";
 import { errorHandler, notFound } from "./middleware/error.middleware.js";
 
@@ -83,6 +84,8 @@ export function createApp(frontendUrl: string) {
   app.use("/api/admin", adminRoutes);
   app.use("/api/gallery", galleryRoutes);
   app.use("/api/business", businessRoutes);
+  app.use("/api/seo", seoRoutes);
+  app.use("/", seoRoutes);
   app.use(notFound);
   app.use(errorHandler);
   return app;
