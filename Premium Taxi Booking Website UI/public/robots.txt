@@ -1,0 +1,61 @@
+# Robots.txt for SS Tours & Travels Solapur
+# Website: https://www.sstour.in/
+
+User-agent: *
+Allow: /
+Allow: /cars
+Allow: /#destinations
+Allow: /#cars
+Allow: /#faq
+Allow: /#contact
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /admin
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /login
+
+# AI & LLM Crawlers Permissions (OpenAI, Anthropic, Perplexity, Google, Bing, etc.)
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /admin
+Disallow: /dashboard
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /admin
+Disallow: /dashboard
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /llms.txt
+Allow: /llms-full.txt
+Disallow: /admin
+Disallow: /dashboard
+
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+
+User-agent: CCBot
+Allow: /
+Allow: /llms.txt
+
+# LLMs Markdown Directory Reference
+# Standard: https://llmstxt.org/
+LLMs-Txt: https://www.sstour.in/llms.txt
+LLMs-Full-Txt: https://www.sstour.in/llms-full.txt
+
+# Sitemap
+Sitemap: https://www.sstour.in/sitemap.xml

@@ -1,132 +1,148 @@
-import { ArrowLeft, KeyRound, LockKeyhole, LogIn, Sparkles } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, LockKeyhole, LogIn, ShieldAlert } from "lucide-react";
 import { useState } from "react";
-import { AUTH_TOKEN_KEY, AUTH_USER_KEY, DEMO_CREDENTIALS } from "../auth";
+import { isAuthenticated, loginAdmin, verifyClientCredentials } from "../auth";
 
 export function LoginPage() {
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const fillDemo = () => {
-    setUsername(DEMO_CREDENTIALS.username);
-    setEmail(DEMO_CREDENTIALS.email);
-    setPassword(DEMO_CREDENTIALS.password);
-    setError("");
-  };
+  // If already logged in, redirect to admin immediately
+  if (isAuthenticated()) {
+    window.location.replace("/admin");
+    return null;
+  }
 
-  function submit(event: React.FormEvent) {
+  function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    const validUser =
-      username.trim().toLowerCase() === DEMO_CREDENTIALS.username.toLowerCase() ||
-      username.trim().toLowerCase() === DEMO_CREDENTIALS.email.toLowerCase();
-    const validEmail =
-      !email || email.trim().toLowerCase() === DEMO_CREDENTIALS.email.toLowerCase();
-    const validPass = password === DEMO_CREDENTIALS.password;
+    setError("");
 
-    if (!validUser || !validPass) {
-      setError("Incorrect credentials. Click 'Auto-Fill Demo' below.");
+    if (!username.trim()) {
+      setError("Please enter your admin username.");
+      return;
+    }
+    if (!password) {
+      setError("Please enter your password.");
       return;
     }
 
-    localStorage.setItem(AUTH_TOKEN_KEY, "demo-token-ss-tours-2026");
-    localStorage.setItem(
-      AUTH_USER_KEY,
-      JSON.stringify({
-        username: DEMO_CREDENTIALS.username,
-        email: DEMO_CREDENTIALS.email
-      })
-    );
+    setSubmitting(true);
+
+    const isValid = verifyClientCredentials(username, password);
+
+    if (!isValid) {
+      setSubmitting(false);
+      setError("Invalid username or password. Please try again.");
+      return;
+    }
+
+    loginAdmin(username);
     window.location.assign("/admin");
   }
 
   return (
-    <main className="flex h-[100dvh] min-h-[100dvh] max-h-[100dvh] items-center justify-center overflow-hidden bg-[#F7F9FC] p-3 text-[#071D49] sm:p-5">
-      <section className="w-full max-w-sm rounded-2xl border border-[#DDE4EF] bg-white p-5 shadow-[0_15px_45px_rgba(7,29,73,0.1)] sm:max-w-md sm:p-7">
+    <main className="flex min-h-screen items-center justify-center bg-[#071D49] p-4 text-[#071D49]">
+      <section className="w-full max-w-md rounded-2xl border border-white/10 bg-white p-6 shadow-2xl sm:p-8">
         {/* Top bar */}
         <div className="flex items-center justify-between">
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-[#F9B900] text-[#071D49]">
-            <LockKeyhole size={18} />
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#F9B900] text-[#071D49] shadow-sm">
+            <LockKeyhole size={20} />
           </span>
           <a
             href="/"
-            className="inline-flex items-center gap-1 text-[11px] font-bold text-[#64748B] transition hover:text-[#071D49]"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#64748B] transition hover:text-[#071D49]"
           >
-            <ArrowLeft size={13} /> Back to website
+            <ArrowLeft size={14} /> Back to website
           </a>
         </div>
 
         {/* Title */}
-        <div className="mt-3 sm:mt-4">
-          <p className="text-[10px] font-bold tracking-[.18em] text-[#9a7100]">
-            OWNER PORTAL
+        <div className="mt-5">
+          <p className="text-[11px] font-bold tracking-[.2em] text-[#9a7100]">
+            SS TOURS &amp; TRAVELS
           </p>
-          <h1 className="mt-0.5 text-2xl font-extrabold tracking-tight text-[#071D49] sm:text-3xl">
-            Sign in
+          <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-[#071D49] sm:text-3xl">
+            Admin Portal Sign In
           </h1>
+          <p className="mt-1.5 text-xs text-[#64748B]">
+            Enter your credentials to access the quote management dashboard.
+          </p>
         </div>
 
         {/* Form */}
-        <form onSubmit={submit} className="mt-4 space-y-2.5 sm:space-y-3">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="block text-[11px] font-bold text-[#475569]">
-              Username
+            <label className="block text-xs font-bold text-[#475569]">
+              Username / ID
             </label>
             <input
               required
+              autoFocus
               autoComplete="username"
               value={username}
-              placeholder="admin"
-              onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] px-3 py-2 text-xs font-normal text-[#071D49] outline-none transition focus:border-[#F9B900] focus:bg-white sm:py-2.5 sm:text-sm"
+              placeholder="Enter admin username"
+              onChange={(e) => {
+                setUsername(e.target.value);
+                if (error) setError("");
+              }}
+              className="mt-1.5 w-full rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3.5 py-3 text-sm font-medium text-[#071D49] outline-none transition focus:border-[#F9B900] focus:bg-white focus:ring-2 focus:ring-[#F9B900]/20"
             />
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold text-[#475569]">
+            <label className="block text-xs font-bold text-[#475569]">
               Password
             </label>
-            <input
-              required
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              placeholder="••••••••"
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] px-3 py-2 text-xs font-normal text-[#071D49] outline-none transition focus:border-[#F9B900] focus:bg-white sm:py-2.5 sm:text-sm"
-            />
+            <div className="relative mt-1.5">
+              <input
+                required
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                value={password}
+                placeholder="Enter password"
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (error) setError("");
+                }}
+                className="w-full rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] px-3.5 py-3 pr-10 text-sm font-medium text-[#071D49] outline-none transition focus:border-[#F9B900] focus:bg-white focus:ring-2 focus:ring-[#F9B900]/20"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#071D49]"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+              </button>
+            </div>
           </div>
 
           {error && (
-            <p role="alert" className="text-xs font-bold text-[#B42318]">
-              {error}
-            </p>
+            <div role="alert" className="flex items-center gap-2 rounded-xl bg-[#FFF2F2] p-3 text-xs font-bold text-[#B42318]">
+              <ShieldAlert size={16} className="shrink-0" />
+              <span>{error}</span>
+            </div>
           )}
 
           <button
             type="submit"
-            className="mt-1 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#071D49] py-2.5 text-xs font-extrabold text-white shadow-sm transition hover:bg-[#F9B900] hover:text-[#071D49] active:scale-[0.98] sm:py-3 sm:text-sm"
+            disabled={submitting}
+            className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#071D49] py-3.5 text-sm font-extrabold text-white shadow-md transition hover:bg-[#F9B900] hover:text-[#071D49] active:scale-[0.98] disabled:opacity-60"
           >
-            <LogIn size={15} /> Login to Dashboard
+            <LogIn size={16} /> Sign In to Dashboard
           </button>
         </form>
 
-        {/* Auto-fill 1-click helper */}
-        <div className="mt-3.5 border-t border-[#F1F5F9] pt-3 text-center sm:mt-4 sm:pt-3.5">
-          <button
-            type="button"
-            onClick={fillDemo}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-[#F9B900]/60 bg-[#FFFDF5] px-3 py-1.5 text-[11px] font-extrabold text-[#805F00] transition hover:bg-[#FFF4CC] active:scale-95"
-          >
-            <Sparkles size={12} className="text-[#F9B900]" /> 1-Click Auto-Fill Demo Login
-          </button>
-
-          <p className="mt-1.5 text-[10px] text-[#94A3B8]">
-            User: <b className="text-[#475569]">admin</b> &nbsp;|&nbsp; Pass: <b className="text-[#475569]">Admin@123</b>
+        <div className="mt-6 border-t border-[#F1F5F9] pt-4 text-center">
+          <p className="text-[11px] text-[#94A3B8]">
+            Protected Area &bull; SS Tours &amp; Travels Admin Portal
           </p>
         </div>
       </section>
     </main>
   );
 }
+
 

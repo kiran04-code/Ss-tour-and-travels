@@ -46,7 +46,19 @@ export function AdminPage() {
         setQuotes(q);
         setCars(c.items);
       })
-      .catch((e: Error) => setError(e.message))
+      .catch((e: Error) => {
+        if (
+          e.message.toLowerCase().includes("authorization") ||
+          e.message.toLowerCase().includes("401") ||
+          e.message.toLowerCase().includes("unauthorized")
+        ) {
+          localStorage.removeItem("ssToursAdminToken");
+          localStorage.removeItem("ssToursAdminUser");
+          window.location.replace("/login");
+          return;
+        }
+        setError(e.message);
+      })
       .finally(() => setLoading(false));
 
   useEffect(() => {
