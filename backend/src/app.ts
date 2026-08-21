@@ -1,5 +1,7 @@
 import cors from "cors";
 import express from "express";
+import mongoose from "mongoose";
+import { connectDatabase } from "./config/db.js";
 import { adminRoutes } from "./routes/admin.routes.js";
 import { carRoutes } from "./routes/car.routes.js";
 import { quoteRoutes } from "./routes/quote.routes.js";
@@ -47,6 +49,20 @@ export function createApp(frontendUrl: string) {
   app.use("/api/uploads", requireAdmin, express.raw({ type: "image/*", limit: "50mb" }), uploadRoutes);
   app.use(express.json({ limit: "1mb" }));
   app.get("/api/health", (_req, res) => res.json({ success: true, message: "API is healthy", data: { uptime: process.uptime() } }));
+
+  // Ensure MongoDB is connected before querying in serverless
+  app.use(async (req, _res, next) => {
+    const mongoUri = process.env.MONGODB_URI;
+    if (mongoUri && mongoose.connection.readyState !== 1) {
+      try {
+        await connectDatabase(mongoUri);
+      } catch (err) {
+        return next(err);
+      }
+    }
+    next();
+  });
+
   app.use("/api/cars", carRoutes);
   app.use("/api/quotes", quoteRoutes);
   app.use("/api/admin", adminRoutes);

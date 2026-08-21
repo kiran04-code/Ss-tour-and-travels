@@ -9,9 +9,8 @@ export async function connectDatabase(uri: string): Promise<typeof mongoose> {
 
   if (!cachedPromise) {
     cachedPromise = mongoose.connect(uri, {
-      bufferCommands: false,
-      serverSelectionTimeoutMS: 10000,
-      connectTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 15000,
+      connectTimeoutMS: 15000,
     }).catch((err) => {
       cachedPromise = null;
       throw err;
@@ -20,4 +19,5 @@ export async function connectDatabase(uri: string): Promise<typeof mongoose> {
 
   return cachedPromise;
 }
+
 
