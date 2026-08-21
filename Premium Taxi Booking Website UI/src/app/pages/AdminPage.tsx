@@ -95,7 +95,7 @@ export function AdminPage() {
         quoteSearch === "" ||
         q.customerName.toLowerCase().includes(quoteSearch.toLowerCase()) ||
         q.customerPhone.includes(quoteSearch) ||
-        q.customerEmail.toLowerCase().includes(quoteSearch.toLowerCase()) ||
+        (q.customerEmail || "").toLowerCase().includes(quoteSearch.toLowerCase()) ||
         q.message.toLowerCase().includes(quoteSearch.toLowerCase());
 
       const matchesStatus =
@@ -365,8 +365,12 @@ export function AdminPage() {
                           {/* Contact Info & Message */}
                           <div className="mt-2.5">
                             <p className="text-xs text-[#64748B]">
-                              📞 {quote.customerPhone} &nbsp;·&nbsp; ✉️{" "}
-                              {quote.customerEmail}
+                              📞 {quote.customerPhone}
+                              {quote.customerEmail ? (
+                                <> &nbsp;·&nbsp; ✉️ {quote.customerEmail}</>
+                              ) : (
+                                <span className="italic text-[#94A3B8]"> &nbsp;·&nbsp; (No email provided)</span>
+                              )}
                             </p>
                             <div className="mt-2 rounded bg-[#F8FAFC] p-2.5 text-xs leading-relaxed text-[#334155]">
                               {quote.message}

@@ -1,9 +1,26 @@
 import { createHash } from "node:crypto";
 import { ApiError } from "../utils/apiError.js";
-const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"]);
+const allowedImageTypes = new Set([
+  "image/jpeg",
+  "image/jpg",
+  "image/pjpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/avif",
+  "image/heic",
+  "image/heif",
+  "image/bmp",
+  "image/tiff",
+  "image/x-icon",
+  "image/svg+xml"
+]);
 
 export async function uploadImage(buffer: Buffer, filename: string, mimeType: string) {
-  if (!allowedImageTypes.has(mimeType.toLowerCase())) throw new ApiError(422, "Use a JPEG, PNG, WebP, GIF, or AVIF image");
+  const normalizedMime = mimeType.toLowerCase().split(";")[0].trim();
+  if (!allowedImageTypes.has(normalizedMime) && !normalizedMime.startsWith("image/")) {
+    throw new ApiError(422, "Please upload a valid image file (JPEG, PNG, WebP, HEIC, GIF, etc.)");
+  }
   if (buffer.length > 50 * 1024 * 1024) throw new ApiError(422, "Image must be smaller than 50 MB");
 
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;

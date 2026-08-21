@@ -26,7 +26,7 @@ export interface QuoteRequest {
   carId: Car | string;
   customerName: string;
   customerPhone: string;
-  customerEmail: string;
+  customerEmail?: string;
   message: string;
   preferredContactMethod: ContactMethod;
   status: QuoteStatus;

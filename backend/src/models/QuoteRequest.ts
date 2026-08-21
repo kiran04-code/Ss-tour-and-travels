@@ -4,7 +4,7 @@ const quoteSchema = new Schema({
   carId: { type: Schema.Types.ObjectId, ref: "Car", required: true, index: true },
   customerName: { type: String, required: true, trim: true },
   customerPhone: { type: String, required: true, trim: true },
-  customerEmail: { type: String, required: true, lowercase: true, trim: true },
+  customerEmail: { type: String, required: false, lowercase: true, trim: true },
   message: { type: String, required: true, trim: true },
   preferredContactMethod: { type: String, enum: ["phone", "email", "whatsapp"], default: "phone" },
   status: { type: String, enum: ["new", "contacted", "quoted", "closed"], default: "new", index: true }

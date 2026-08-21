@@ -46,7 +46,7 @@ export function createApp(frontendUrl: string) {
       allowedHeaders: ["Content-Type", "Authorization", "X-Admin-Token", "Accept"]
     })
   );
-  app.use("/api/uploads", requireAdmin, express.raw({ type: "image/*", limit: "50mb" }), uploadRoutes);
+  app.use("/api/uploads", requireAdmin, express.raw({ type: ["image/*", "application/octet-stream"], limit: "50mb" }), uploadRoutes);
   app.use(express.json({ limit: "1mb" }));
   app.get("/api/health", (_req, res) => res.json({ success: true, message: "API is healthy", data: { uptime: process.uptime() } }));
 

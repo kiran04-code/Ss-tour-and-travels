@@ -5,7 +5,7 @@ import { notificationService } from "./notification.service.js";
 import { emailService } from "./email.service.js";
 
 export const quoteService = {
-  async create(input: { carId: string; customerName: string; customerPhone: string; customerEmail: string; message: string; preferredContactMethod?: string }) {
+  async create(input: { carId: string; customerName: string; customerPhone: string; customerEmail?: string; message: string; preferredContactMethod?: string }) {
     const car = await Car.findById(input.carId).lean();
     if (!car) throw new ApiError(404, "Car not found");
     const quote = await QuoteRequest.create(input);
@@ -37,7 +37,7 @@ export const quoteService = {
     const quotes = await QuoteRequest.find(filter).populate("carId").sort({ createdAt: -1 }).lean();
     if (!query.search) return quotes;
     const search = query.search.toLowerCase();
-    return quotes.filter((quote) => quote.customerName.toLowerCase().includes(search) || quote.customerPhone.includes(search) || quote.customerEmail.toLowerCase().includes(search) || (quote.carId as { name?: string })?.name?.toLowerCase().includes(search));
+    return quotes.filter((quote) => quote.customerName.toLowerCase().includes(search) || quote.customerPhone.includes(search) || (quote.customerEmail && quote.customerEmail.toLowerCase().includes(search)) || (quote.carId as { name?: string })?.name?.toLowerCase().includes(search));
   },
   async get(id: string) {
     const quote = await QuoteRequest.findById(id).populate("carId").lean();

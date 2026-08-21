@@ -115,7 +115,7 @@ export function GalleryManager() {
           ref={fileInputRef}
           className="hidden"
           type="file"
-          accept="image/jpeg,image/png,image/webp,image/avif,image/gif"
+          accept="image/*,.heic,.heif,.jpg,.jpeg,.png,.webp,.avif"
           multiple
           onChange={handleSelectFiles}
         />
@@ -131,7 +131,7 @@ export function GalleryManager() {
             Tap to select photos from your device
           </p>
           <p className="mt-1 text-[11px] text-[#64748B]">
-            Supports JPG, PNG, WebP up to 50 MB (Auto-compressed for fast loading)
+            Supports JPG, PNG, HEIC, WebP up to 50 MB (Auto-compressed for fast loading)
           </p>
         </div>
       </div>

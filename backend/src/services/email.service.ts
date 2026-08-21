@@ -4,7 +4,7 @@ export interface QuoteNotificationPayload {
   quoteId: string;
   customerName: string;
   customerPhone: string;
-  customerEmail: string;
+  customerEmail?: string;
   message: string;
   carName: string;
   preferredContactMethod?: string;
@@ -17,6 +17,9 @@ export const emailService = {
     const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:5173").replace(/\/$/, "");
     const adminUrl = `${frontendUrl}/admin`;
     const cleanPhone = payload.customerPhone.replace(/\D/g, "");
+    const emailDisplay = payload.customerEmail
+      ? `<a href="mailto:${payload.customerEmail}" style="color: #071D49;">${payload.customerEmail}</a>`
+      : `<span style="color: #94A3B8;">Not provided</span>`;
 
     const subject = `🚖 New Quote Request: ${payload.customerName} (${payload.carName}) - SS Tours & Travels`;
 
@@ -70,9 +73,7 @@ export const emailService = {
         </tr>
         <tr>
           <td class="label">Email Address:</td>
-          <td class="value">
-            <a href="mailto:${payload.customerEmail}" style="color: #071D49;">${payload.customerEmail}</a>
-          </td>
+          <td class="value">${emailDisplay}</td>
         </tr>
         <tr>
           <td class="label">Requested Vehicle:</td>
@@ -118,7 +119,7 @@ New Taxi Quote Request - SS Tours & Travels
 Customer Details:
 - Name: ${payload.customerName}
 - Phone: ${payload.customerPhone}
-- Email: ${payload.customerEmail}
+- Email: ${payload.customerEmail || "Not provided"}
 - Vehicle: ${payload.carName}
 - Time: ${new Date(payload.createdAt || Date.now()).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
 
