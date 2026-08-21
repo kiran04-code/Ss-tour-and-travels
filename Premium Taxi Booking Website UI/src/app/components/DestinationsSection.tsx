@@ -56,12 +56,19 @@ export function DestinationsSection() {
       return;
     }
 
-    setSubmitting(true);
-    setErrorMessage("");
+    const formatTravelDate = (dStr: string) => {
+      try {
+        const d = new Date(dStr);
+        if (!isNaN(d.getTime())) return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+      } catch {}
+      return dStr;
+    };
 
     const destString = selected.length ? selected.map(p => p.name).join(" → ") : "Solapur Sightseeing Tour";
+    const formattedDate = formatTravelDate(formData.date);
+    const returnDateText = formData.returnDate ? `\n• Return Date: ${formatTravelDate(formData.returnDate)}` : "";
     const messageText = `Multi-Destination Tour: Solapur to ${destString}. Travel Date: ${formData.date}${formData.returnDate ? `, Return: ${formData.returnDate}` : ""}. Passengers: ${formData.passengers}. Car Type: ${formData.carType}. Requirements: ${formData.requirements || "None"}.`;
-    const waMsg = `*Multi-Stop Tour Quote Request - SS Tours & Travels*\n\n📍 *Route:* Solapur ➔ ${destString}\n📅 *Travel Date:* ${formData.date}\n👥 *Passengers:* ${formData.passengers}\n🚘 *Car Preference:* ${formData.carType}\n\n👤 *Client Name:* ${formData.name.trim()}\n📞 *Mobile Number:* +91 ${cleanPhone}\n\n_Please send custom itinerary quote and taxi availability._`;
+    const waMsg = `Hello SS Tours & Travels,\n\nI want to plan a multi-destination tour for:\n• Route: Solapur to ${destString}\n• Travel Date: ${formattedDate}${returnDateText}\n• Passengers: ${formData.passengers}\n• Preferred Car: ${formData.carType}\n\nMy Details:\n• Name: ${formData.name.trim()}\n• Mobile: +91 ${cleanPhone}\n\nPlease share the custom itinerary quote and taxi availability. Thank you!`;
     const directUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(waMsg)}`;
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 

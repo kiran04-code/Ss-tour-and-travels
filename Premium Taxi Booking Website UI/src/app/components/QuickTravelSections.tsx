@@ -116,8 +116,19 @@ export function QuickTravelSections() {
     setSubmitting(true);
     setErrorMessage("");
 
+    const formatTravelDate = (dStr: string) => {
+      try {
+        const d = new Date(dStr);
+        if (!isNaN(d.getTime())) {
+          return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+        }
+      } catch {}
+      return dStr;
+    };
+
     const journeyMessage = `Route: ${form.pickup.trim()} to ${form.drop.trim()} (${form.tripType}) on ${form.date}. Preferred: ${form.car}.`;
-    const textMessage = `*Taxi Booking Request - SS Tours & Travels*\n\n📍 *Route:* ${form.pickup.trim()} ➔ ${form.drop.trim()}\n🚗 *Trip Type:* ${form.tripType}\n📅 *Travel Date:* ${form.date}\n🚘 *Vehicle:* ${form.car}\n\n👤 *Client Name:* ${form.name.trim()}\n📞 *Mobile Number:* +91 ${cleanPhone}\n\n_Please confirm taxi availability, fare quote, and driver details._`;
+    const formattedDate = formatTravelDate(form.date);
+    const textMessage = `Hello SS Tours & Travels,\n\nI want to book a taxi for:\n• Route: ${form.pickup.trim()} to ${form.drop.trim()} (${form.tripType})\n• Date: ${formattedDate}\n• Preferred Car: ${form.car}\n\nMy Details:\n• Name: ${form.name.trim()}\n• Mobile: +91 ${cleanPhone}\n\nPlease share the fare quote and cab availability. Thank you!`;
     const directWaUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodeURIComponent(textMessage)}`;
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 

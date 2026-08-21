@@ -47,7 +47,7 @@ export const quoteService = {
     const savedQuote = await QuoteRequest.findById(quote._id).populate("carId").lean();
     const recipient = (process.env.WHATSAPP_QUOTE_NUMBER || "").replace(/\D/g, "");
     if (!recipient) return savedQuote;
-    const message = `Hello, I would like to request a quote for this journey.\n\nJOURNEY DETAILS\nPreferred Vehicle: ${car.name} (${car.brand} · ${car.fuelType})\n\nCLIENT DETAILS\nName: ${input.customerName}\nWhatsApp: ${input.customerPhone}\n\nREQUEST\n${input.message}\n\nPlease contact me with fare details and availability.`;
+    const message = `Hello SS Tours & Travels,\n\nI want to book a taxi for:\n• Journey / Details: ${input.message}\n• Vehicle: ${car.name}\n\nMy Details:\n• Name: ${input.customerName}\n• Mobile: ${input.customerPhone}\n\nPlease share the fare quote and cab availability. Thank you!`;
     return { ...savedQuote, whatsappUrl: `https://wa.me/${recipient}?text=${encodeURIComponent(message)}` };
   },
   async list(query: Record<string, string | undefined>) {

@@ -96,7 +96,15 @@ export default function App() {
         if (!selectedCar?.id) { setQuoteError("Please select an available car before sending your request."); return; }
 
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        const waText = `*Taxi Booking Request - SS Tours & Travels*\n\n📍 *Route:* ${quote.pickup.trim()} ➔ ${quote.drop.trim()}\n📅 *Travel Date:* ${quote.date}\n🚘 *Car:* ${selectedCar.name}\n\n👤 *Client Name:* ${quote.name.trim()}\n📞 *Mobile Number:* +91 ${mobile}\n\n_Please confirm taxi availability and fare quote._`;
+        const formatTravelDate = (dStr: string) => {
+            try {
+                const d = new Date(dStr);
+                if (!isNaN(d.getTime())) return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+            } catch {}
+            return dStr;
+        };
+        const formattedDate = formatTravelDate(quote.date);
+        const waText = `Hello SS Tours & Travels,\n\nI want to book a taxi for:\n• Route: ${quote.pickup.trim()} to ${quote.drop.trim()}\n• Date: ${formattedDate}\n• Preferred Car: ${selectedCar.name}\n\nMy Details:\n• Name: ${quote.name.trim()}\n• Mobile: +91 ${mobile}\n\nPlease share the fare quote and cab availability. Thank you!`;
         const directWaUrl = `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(waText)}`;
 
         if (submissionChannel === "whatsapp") {
