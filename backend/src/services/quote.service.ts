@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Car } from "../models/Car.js";
 import { QuoteRequest } from "../models/QuoteRequest.js";
 import { ApiError } from "../utils/apiError.js";
@@ -6,9 +7,29 @@ import { emailService } from "./email.service.js";
 
 export const quoteService = {
   async create(input: { carId: string; customerName: string; customerPhone: string; customerEmail?: string; message: string; preferredContactMethod?: string }) {
-    const car = await Car.findById(input.carId).lean();
-    if (!car) throw new ApiError(404, "Car not found");
-    const quote = await QuoteRequest.create(input);
+    let car = null;
+    if (input.carId && mongoose.isValidObjectId(input.carId)) {
+      car = await Car.findById(input.carId).lean();
+    }
+    if (!car) {
+      car = await Car.findOne({ status: "available" }).lean() || await Car.findOne().lean();
+    }
+    if (!car) {
+      car = await Car.create({
+        name: "Standard AC Taxi",
+        brand: "Toyota / Maruti",
+        year: 2024,
+        description: "Comfortable AC Solapur Taxi",
+        location: "Solapur",
+        fuelType: "Diesel",
+        transmission: "Manual",
+        ownerName: "SS Tours & Travels",
+        ownerPhone: "+918010374300",
+        ownerEmail: "sstourssolapur@gmail.com",
+        status: "available"
+      });
+    }
+    const quote = await QuoteRequest.create({ ...input, carId: car._id });
     notificationService.notifyNewQuote(String(quote._id), car.name);
 
     // Asynchronously send email notification to admin without blocking the response
@@ -26,7 +47,7 @@ export const quoteService = {
     const savedQuote = await QuoteRequest.findById(quote._id).populate("carId").lean();
     const recipient = (process.env.WHATSAPP_QUOTE_NUMBER || "").replace(/\D/g, "");
     if (!recipient) return savedQuote;
-    const message = `Hello, I would like to request a quote for this car.\n\nCAR DETAILS\nCar: ${car.name}\nBrand: ${car.brand}\nModel: ${car.model}\nYear: ${car.year}\nDescription: ${car.description}\nFuel: ${car.fuelType}\nTransmission: ${car.transmission}\nLocation: ${car.location}\n\nCLIENT DETAILS\nName: ${input.customerName}\nWhatsApp: ${input.customerPhone}\n\nREQUEST\n${input.message}\n\nPlease contact me regarding this car.`;
+    const message = `Hello, I would like to request a quote for this journey.\n\nJOURNEY DETAILS\nPreferred Vehicle: ${car.name} (${car.brand} · ${car.fuelType})\n\nCLIENT DETAILS\nName: ${input.customerName}\nWhatsApp: ${input.customerPhone}\n\nREQUEST\n${input.message}\n\nPlease contact me with fare details and availability.`;
     return { ...savedQuote, whatsappUrl: `https://wa.me/${recipient}?text=${encodeURIComponent(message)}` };
   },
   async list(query: Record<string, string | undefined>) {

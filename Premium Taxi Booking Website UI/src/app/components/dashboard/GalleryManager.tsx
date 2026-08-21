@@ -43,7 +43,7 @@ export function GalleryManager() {
         await businessApi.createGalleryImage({
           url: uploaded.url,
           publicId: uploaded.publicId,
-          alt: file.name.replace(/[-_]/g, " ").replace(/\.[^.]+$/, "")
+          alt: "SS Tours & Travels Solapur Ride"
         });
         setCurrentProgress(Math.round(((i + 1) / total) * 100));
       }
@@ -269,7 +269,7 @@ export function GalleryManager() {
                 />
                 <button
                   type="button"
-                  aria-label={`Delete ${image.alt || "image"}`}
+                  aria-label="Delete image"
                   disabled={remove.isPending}
                   onClick={() => {
                     if (window.confirm("Delete this photo from the website gallery?")) {
@@ -280,9 +280,6 @@ export function GalleryManager() {
                 >
                   <Trash2 size={13} />
                 </button>
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 text-[10px] font-bold text-white opacity-0 transition group-hover:opacity-100">
-                  {image.alt || "Gallery image"}
-                </div>
               </div>
             ))}
           </div>

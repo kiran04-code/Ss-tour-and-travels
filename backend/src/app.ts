@@ -43,10 +43,25 @@ export function createApp(frontendUrl: string) {
       },
       credentials: true,
       methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization", "X-Admin-Token", "Accept"]
+      allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+        "X-Admin-Token",
+        "X-File-Name",
+        "x-file-name",
+        "Accept",
+        "Origin",
+        "X-Requested-With"
+      ],
+      exposedHeaders: ["Content-Range", "X-Content-Range"]
     })
   );
-  app.use("/api/uploads", requireAdmin, express.raw({ type: ["image/*", "application/octet-stream"], limit: "50mb" }), uploadRoutes);
+  app.use(
+    "/api/uploads",
+    requireAdmin,
+    express.raw({ type: () => true, limit: "50mb" }),
+    uploadRoutes
+  );
   app.use(express.json({ limit: "1mb" }));
   app.get("/api/health", (_req, res) => res.json({ success: true, message: "API is healthy", data: { uptime: process.uptime() } }));
 

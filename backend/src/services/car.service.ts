@@ -3,7 +3,7 @@ import { QuoteRequest } from "../models/QuoteRequest.js";
 import { ApiError } from "../utils/apiError.js";
 
 type CarInput = {
-  name: string; brand: string; model: string; year: number; description: string; images?: string[];
+  name: string; brand: string; model?: string; year: number; description: string; images?: string[];
   location: string; fuelType: string; transmission: string; ownerName: string; ownerPhone: string; ownerEmail: string; status?: string;
 };
 
@@ -23,7 +23,7 @@ export const carService = {
     if (query.location) filter.location = new RegExp(query.location, "i");
     if (query.fuelType) filter.fuelType = query.fuelType;
     if (query.transmission) filter.transmission = query.transmission;
-    if (query.search) filter.$or = ["name", "brand", "model", "location"].map((field) => ({ [field]: new RegExp(query.search!, "i") }));
+    if (query.search) filter.$or = ["name", "brand", "location"].map((field) => ({ [field]: new RegExp(query.search!, "i") }));
     const [items, total] = await Promise.all([Car.find(filter).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit).lean(), Car.countDocuments(filter)]);
     return { items, pagination: { page, limit, total, pages: Math.ceil(total / limit) } };
   },

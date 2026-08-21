@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { carService } from "../services/car.service.js";
 import { sendError, sendSuccess } from "../utils/apiResponse.js";
 
-const required = ["name", "brand", "model", "year", "description", "location", "fuelType", "transmission", "ownerName", "ownerPhone", "ownerEmail"];
+const required = ["name", "brand", "year", "description", "location", "fuelType", "transmission", "ownerName", "ownerPhone", "ownerEmail"];
 
 export const carController = {
   async list(req: Request, res: Response) { return sendSuccess(res, await carService.list(req.query as Record<string, string | undefined>)); },

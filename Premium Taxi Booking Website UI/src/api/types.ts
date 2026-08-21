@@ -6,7 +6,7 @@ export interface Car {
   _id: string;
   name: string;
   brand: string;
-  model: string;
+  model?: string;
   year: number;
   description: string;
   images: string[];

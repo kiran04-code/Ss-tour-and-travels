@@ -3,7 +3,7 @@ import { Schema, model, type InferSchemaType } from "mongoose";
 const carSchema = new Schema({
   name: { type: String, required: true, trim: true },
   brand: { type: String, required: true, trim: true },
-  model: { type: String, required: true, trim: true },
+  model: { type: String, trim: true, default: "" },
   year: { type: Number, required: true, min: 1900, max: 2200 },
   description: { type: String, required: true, trim: true },
   images: { type: [String], default: [] },

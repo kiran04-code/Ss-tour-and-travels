@@ -89,16 +89,13 @@ export function GallerySection() {
                   </div>
 
                   {/* Bottom Text Overlay */}
-                  <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[#F9B900] px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#071D49]">
-                      <Sparkles size={11} /> Verified Ride
-                    </span>
-                    <h3 className="mt-2 text-base font-extrabold text-white sm:text-lg line-clamp-1">
-                      {image.alt || "Customer Travel Experience"}
-                    </h3>
-                    <p className="mt-0.5 text-xs text-white/75 flex items-center gap-1.5">
-                      <span>Solapur &amp; Outstation Journey</span>
-                    </p>
+                  <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5 text-white">
+                    <div className="flex items-center justify-between">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[#F9B900] px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#071D49] shadow-sm">
+                        <Sparkles size={11} /> Verified Ride
+                      </span>
+                      <span className="text-[11px] font-medium text-white/85 drop-shadow-sm">Solapur &amp; Outstation</span>
+                    </div>
                   </div>
                 </div>
               </article>
@@ -130,14 +127,9 @@ export function GallerySection() {
           >
             <img
               src={selected.url}
-              alt={selected.alt || "Gallery preview"}
+              alt="SS Tours &amp; Travels Solapur Journey"
               className="max-h-[78vh] w-full rounded-xl object-contain"
             />
-            {selected.alt && (
-              <p className="mt-3 px-2 text-center text-xs font-bold text-[#071D49]">
-                {selected.alt}
-              </p>
-            )}
           </div>
         </div>
       )}

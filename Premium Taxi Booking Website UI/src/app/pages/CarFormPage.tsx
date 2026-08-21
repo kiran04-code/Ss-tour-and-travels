@@ -5,8 +5,8 @@ import { uploadApi } from "../../api/uploadApi";
 import type { CarStatus } from "../../api/types";
 import { DashboardLayout, ErrorState } from "../components/dashboard/DashboardLayout";
 
-const emptyForm: CarPayload = { name: "", brand: "", model: "", year: new Date().getFullYear(), description: "", images: [], location: "", fuelType: "Petrol", transmission: "Manual", ownerName: "", ownerPhone: "", ownerEmail: "", status: "available" };
-const fields: Array<[keyof CarPayload, string, string]> = [["name", "Car Name", "text"], ["brand", "Brand", "text"], ["model", "Model", "text"], ["year", "Year", "number"], ["location", "Location", "text"], ["ownerName", "Owner Name", "text"], ["ownerPhone", "Owner Phone", "tel"], ["ownerEmail", "Owner Email", "email"]];
+const emptyForm: CarPayload = { name: "", brand: "", year: new Date().getFullYear(), description: "", images: [], location: "", fuelType: "Petrol", transmission: "Manual", ownerName: "", ownerPhone: "", ownerEmail: "", status: "available" };
+const fields: Array<[keyof CarPayload, string, string]> = [["name", "Car Name", "text"], ["brand", "Brand", "text"], ["year", "Year", "number"], ["location", "Location", "text"], ["ownerName", "Owner Name", "text"], ["ownerPhone", "Owner Phone", "tel"], ["ownerEmail", "Owner Email", "email"]];
 export function CarFormPage({ id }: { id?: string }) {
   const editing = Boolean(id), inputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState<CarPayload>(emptyForm), [loading, setLoading] = useState(editing), [submitting, setSubmitting] = useState(false), [uploading, setUploading] = useState(false), [error, setError] = useState("");
