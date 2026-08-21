@@ -2,6 +2,7 @@ import { Car } from "../models/Car.js";
 import { QuoteRequest } from "../models/QuoteRequest.js";
 import { ApiError } from "../utils/apiError.js";
 import { notificationService } from "./notification.service.js";
+import { emailService } from "./email.service.js";
 
 export const quoteService = {
   async create(input: { carId: string; customerName: string; customerPhone: string; customerEmail: string; message: string; preferredContactMethod?: string }) {
@@ -9,6 +10,19 @@ export const quoteService = {
     if (!car) throw new ApiError(404, "Car not found");
     const quote = await QuoteRequest.create(input);
     notificationService.notifyNewQuote(String(quote._id), car.name);
+
+    // Asynchronously send email notification to admin without blocking the response
+    void emailService.sendNewQuoteNotification({
+      quoteId: String(quote._id),
+      customerName: input.customerName,
+      customerPhone: input.customerPhone,
+      customerEmail: input.customerEmail,
+      message: input.message,
+      carName: car.name,
+      preferredContactMethod: input.preferredContactMethod,
+      createdAt: quote.createdAt
+    }).catch((err) => console.error("[Quote Service] Email alert error:", (err as Error).message));
+
     const savedQuote = await QuoteRequest.findById(quote._id).populate("carId").lean();
     const recipient = (process.env.WHATSAPP_QUOTE_NUMBER || "").replace(/\D/g, "");
     if (!recipient) return savedQuote;
