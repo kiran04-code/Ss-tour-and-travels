@@ -26,7 +26,7 @@ function toFleetCar(car: DatabaseCar): FleetCar {
     name: car.name,
     type: car.brand ? `${car.brand} · ${car.transmission}` : "Premium Taxi",
     seats: `${car.fuelType} · ${car.transmission}`,
-    tag: "DB Listing",
+    tag: "",
     img: images[0] || "",
     images: images,
     description: car.description,
