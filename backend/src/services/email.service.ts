@@ -28,7 +28,7 @@ function getCleanAdminUrl(): string {
 
 export const emailService = {
   async sendNewQuoteNotification(payload: QuoteNotificationPayload): Promise<void> {
-    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || "kiran.rathod.dev1@gmail.com";
+    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || "Sidhantsakhare6@gmail.com";
     const adminUrl = getCleanAdminUrl();
     const cleanPhone = payload.customerPhone.replace(/\D/g, "");
     const emailDisplay = payload.customerEmail
