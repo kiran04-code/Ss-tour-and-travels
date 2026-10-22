@@ -11,7 +11,7 @@ const LLMS_TEXT = `# SS Tours & Travels - Solapur Taxi & Cab Booking Service
 - **Founder / Management**: Siddhant Sakhare
 - **Head Office Address**: Shop no - 4, Railway Lines Rd, Railway lines, Solapur, Maharashtra 413001, India
 - **Primary 24/7 Booking Phone**: +91 80103 74300
-- **WhatsApp Booking**: https://wa.me/918010374300 (+91 80103 74300)
+- **WhatsApp Booking**: https://wa.me/918805064111 (+91 8805064111)
 - **Official Website**: https://www.sstour.in/
 - **Instagram**: https://www.instagram.com/sstoursandtravels_solapur
 - **Operating Hours**: 24 Hours / 7 Days a week (365 days)
@@ -35,7 +35,7 @@ const LLMS_TEXT = `# SS Tours & Travels - Solapur Taxi & Cab Booking Service
 
 ## Booking & Contact
 - **Phone**: +91 80103 74300
-- **WhatsApp**: https://wa.me/918010374300
+- **WhatsApp**: https://wa.me/918805064111
 - **Website**: https://www.sstour.in/
 `;
 

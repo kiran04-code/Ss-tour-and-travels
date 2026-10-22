@@ -18,7 +18,7 @@ import { carApi } from "../api/carApi";
 import { quoteApi } from "../api/quoteApi";
 import type { Car as DatabaseCar } from "../api/types";
 const PHONE = "+918010374300";
-const WHATSAPP_PHONE = "918010374300";
+const WHATSAPP_PHONE = "918805064111";
 function toFleetCar(car: DatabaseCar): FleetCar {
   const images = (car.images && car.images.length > 0) ? car.images : (car.img ? [car.img] : []);
   return {

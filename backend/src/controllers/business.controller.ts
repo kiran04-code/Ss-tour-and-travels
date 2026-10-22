@@ -5,7 +5,7 @@ export const businessController = {
     const defaultLinks = [
       { platform: "Instagram", url: process.env.SOCIAL_INSTAGRAM_URL || "https://www.instagram.com/sstoursandtravels_solapur?igsi=bmgzcnlrcjA3aDlu" },
       { platform: "Facebook", url: process.env.SOCIAL_FACEBOOK_URL || "https://www.facebook.com" },
-      { platform: "WhatsApp", url: `https://wa.me/${(process.env.WHATSAPP_QUOTE_NUMBER || "8010374300").replace(/\D/g, "")}` },
+      { platform: "WhatsApp", url: `https://wa.me/${(process.env.WHATSAPP_QUOTE_NUMBER || "918805064111").replace(/\D/g, "")}` },
       { platform: "YouTube", url: process.env.SOCIAL_YOUTUBE_URL || "https://www.youtube.com" }
     ];
     return sendSuccess(res, defaultLinks);

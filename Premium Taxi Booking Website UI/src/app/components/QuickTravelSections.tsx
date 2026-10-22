@@ -28,7 +28,7 @@ const allDestinations = [
   "Mahabaleshwar", "Nashik", "Aurangabad", "Solapur Local Station / City"
 ];
 
-const WHATSAPP_NUMBER = "918010374300";
+const WHATSAPP_NUMBER = "918805064111";
 const CALL_NUMBER = "+918010374300";
 
 function SectionTitle({ children }: { children: ReactNode }) {

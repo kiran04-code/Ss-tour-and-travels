@@ -17,7 +17,7 @@ const places: Destination[] = [
 ].map(([name, distance, description, cars], index) => ({ name, distance, description, cars, image: photos[index % photos.length] }));
 
 const vehicleTypes = ["Sedan", "SUV", "Premium Car", "7-Seater", "12-Seater"];
-const WHATSAPP_PHONE = "918010374300";
+const WHATSAPP_PHONE = "918805064111";
 const CALL_PHONE = "+918010374300";
 
 export function DestinationsSection() {

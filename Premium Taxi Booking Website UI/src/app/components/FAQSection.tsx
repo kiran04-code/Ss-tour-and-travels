@@ -183,7 +183,7 @@ export function FAQSection() {
             </a>
 
             <a
-              href="https://wa.me/918010374300?text=Hello%20SS%20Tours%20%26%20Travels,%20I%20have%20a%20question%20regarding%20a%20taxi%20booking."
+              href="https://wa.me/918805064111?text=Hello%20SS%20Tours%20%26%20Travels,%20I%20have%20a%20question%20regarding%20a%20taxi%20booking."
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-xl border border-[#26734D] bg-[#EEF7F1] px-5 py-3 text-xs font-bold text-[#26734D] transition hover:bg-[#26734D] hover:text-white active:scale-[0.98]"
