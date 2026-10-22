@@ -14,7 +14,7 @@ const faqs: FAQItem[] = [
     category: "Booking",
     question: "How do I book a cab with SS Tours & Travels Solapur?",
     answer:
-      "You can book instantly by calling our 24/7 hotline at +91 80103 74300, sending us a message on WhatsApp, or submitting the quick quote form on this website. Our team confirms your ride immediately with vehicle and driver details."
+      "You can book instantly by calling our 24/7 hotline at +91 8805064111, sending us a message on WhatsApp, or submitting the quick quote form on this website. Our team confirms your ride immediately with vehicle and driver details."
   },
   {
     id: "temple-tours",
@@ -176,10 +176,10 @@ export function FAQSection() {
 
           <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
             <a
-              href="tel:+918010374300"
+              href="tel:+918805064111"
               className="inline-flex items-center gap-2 rounded-xl bg-[#071D49] px-5 py-3 text-xs font-bold text-white shadow-sm transition hover:bg-[#F9B900] hover:text-[#071D49] active:scale-[0.98]"
             >
-              <Phone size={14} /> Call +91 80103 74300
+              <Phone size={14} /> Call +91 8805064111
             </a>
 
             <a

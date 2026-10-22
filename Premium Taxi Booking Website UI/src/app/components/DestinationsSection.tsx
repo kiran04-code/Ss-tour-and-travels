@@ -18,7 +18,7 @@ const places: Destination[] = [
 
 const vehicleTypes = ["Sedan", "SUV", "Premium Car", "7-Seater", "12-Seater"];
 const WHATSAPP_PHONE = "918805064111";
-const CALL_PHONE = "+918010374300";
+const CALL_PHONE = "+918805064111";
 
 export function DestinationsSection() {
   const [selected, setSelected] = useState<Destination[]>([]);
@@ -269,7 +269,7 @@ export function DestinationsSection() {
                     href={`tel:${CALL_PHONE}`}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-[#071D49] px-5 py-3 text-xs font-bold text-white transition hover:bg-[#F9B900] hover:text-[#071D49]"
                   >
-                    <Phone size={14} /> Call Dispatch (+91 80103 74300)
+                    <Phone size={14} /> Call Dispatch (+91 8805064111)
                   </a>
                   <button
                     type="button"
@@ -314,7 +314,7 @@ export function DestinationsSection() {
                           if (val.startsWith("0")) val = val.slice(1);
                           setFormData({ ...formData, phone: val.slice(0, 10) });
                         }}
-                        placeholder="80103 74300"
+                        placeholder="8805064111"
                         className="w-full bg-transparent px-3 py-2.5 text-sm font-semibold text-[#071D49] outline-none placeholder:text-[#94A3B8]"
                       />
                     </div>

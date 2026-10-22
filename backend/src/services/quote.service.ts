@@ -24,7 +24,7 @@ export const quoteService = {
         fuelType: "Diesel",
         transmission: "Manual",
         ownerName: "SS Tours & Travels",
-        ownerPhone: "+918010374300",
+        ownerPhone: "+918805064111",
         ownerEmail: "sstourssolapur@gmail.com",
         status: "available"
       });

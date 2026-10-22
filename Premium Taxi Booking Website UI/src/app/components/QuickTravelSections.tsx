@@ -29,7 +29,7 @@ const allDestinations = [
 ];
 
 const WHATSAPP_NUMBER = "918805064111";
-const CALL_NUMBER = "+918010374300";
+const CALL_NUMBER = "+918805064111";
 
 function SectionTitle({ children }: { children: ReactNode }) {
   return (
@@ -282,7 +282,7 @@ export function QuickTravelSections() {
                     href={`tel:${CALL_NUMBER}`}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-[#071D49] px-5 py-3 text-xs font-bold text-white transition hover:bg-[#F9B900] hover:text-[#071D49]"
                   >
-                    <Phone size={14} /> Call Dispatch (+91 80103 74300)
+                    <Phone size={14} /> Call Dispatch (+91 8805064111)
                   </a>
                   <button
                     type="button"
@@ -404,7 +404,7 @@ export function QuickTravelSections() {
                           if (val.startsWith("0")) val = val.slice(1);
                           setForm({ ...form, phone: val.slice(0, 10) });
                         }}
-                        placeholder="80103 74300"
+                        placeholder="8805064111"
                         className="w-full bg-transparent px-3 py-2 text-xs font-semibold text-[#071D49] outline-none placeholder:text-[#94A3B8]"
                       />
                     </div>

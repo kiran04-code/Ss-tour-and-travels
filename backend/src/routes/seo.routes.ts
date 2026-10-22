@@ -10,7 +10,7 @@ const LLMS_TEXT = `# SS Tours & Travels - Solapur Taxi & Cab Booking Service
 - **Business Name**: SS Tours & Travels
 - **Founder / Management**: Siddhant Sakhare
 - **Head Office Address**: Shop no - 4, Railway Lines Rd, Railway lines, Solapur, Maharashtra 413001, India
-- **Primary 24/7 Booking Phone**: +91 80103 74300
+- **Primary 24/7 Booking Phone**: +91 8805064111
 - **WhatsApp Booking**: https://wa.me/918805064111 (+91 8805064111)
 - **Official Website**: https://www.sstour.in/
 - **Instagram**: https://www.instagram.com/sstoursandtravels_solapur
@@ -34,7 +34,7 @@ const LLMS_TEXT = `# SS Tours & Travels - Solapur Taxi & Cab Booking Service
 - **Solapur to Hyderabad Taxi** (~300 km, ~5.5 hrs): Hyderabad Rajiv Gandhi International Airport (HYD) cabs.
 
 ## Booking & Contact
-- **Phone**: +91 80103 74300
+- **Phone**: +91 8805064111
 - **WhatsApp**: https://wa.me/918805064111
 - **Website**: https://www.sstour.in/
 `;

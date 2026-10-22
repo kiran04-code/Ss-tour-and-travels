@@ -61,7 +61,7 @@ export const businessController = {
         userRatingCount: 128,
         businessName: process.env.BUSINESS_NAME || "SS Tours & Travels (Siddhant Sakhare)",
         businessEmail: process.env.BUSINESS_EMAIL || "Sidhantsakhare6@gmail.com",
-        businessPhone: process.env.BUSINESS_PHONE || "8010374300",
+        businessPhone: process.env.BUSINESS_PHONE || "8805064111",
         reviews: defaultReviews
       });
     }

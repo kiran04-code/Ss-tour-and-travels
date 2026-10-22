@@ -5,7 +5,7 @@ import { businessApi } from "../../api/businessApi";
 export function OfficeLocationSection() {
   const { data } = useQuery({ queryKey: ["office-location"], queryFn: businessApi.getLocation });
   const address = data?.address || "Shop no - 4, Railway Lines Rd, Railway lines, Solapur, Maharashtra 413001";
-  const phone = data?.phone || "+918010374300";
+  const phone = data?.phone || "+918805064111";
   const directionsUrl = data?.directionsUrl || "https://maps.google.com/?q=Shop+no+-+4+%2C+Railway+Lines+Rd%2C+Railway+lines%2C+Solapur%2C+Maharashtra+413001";
   const mapEmbedUrl = data?.mapEmbedUrl || "https://maps.google.com/maps?q=Shop+no+-+4+%2C+Railway+Lines+Rd%2C+Railway+lines%2C+Solapur%2C+Maharashtra+413001&t=&z=15&ie=UTF8&iwloc=&output=embed";
 
